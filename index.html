@@ -35,7 +35,7 @@ html,body{height:100%;background:var(--bg);color:var(--body);font-family:-apple-
 ::-webkit-scrollbar{width:2px}::-webkit-scrollbar-thumb{background:var(--line2);border-radius:2px}
 
 /* ── APP SHELL ── */
-.app{display:flex;flex-direction:column;height:100dvh;max-width:430px;margin:0 auto}
+.app{display:flex;flex-direction:column;height:100dvh;height:100vh;max-width:430px;margin:0 auto;overflow:hidden}
 
 /* ── HEADER ── */
 .hdr{flex-shrink:0;background:var(--bg2);border-bottom:1px solid var(--line);padding:10px 16px 12px}
@@ -58,8 +58,8 @@ html,body{height:100%;background:var(--bg);color:var(--body);font-family:-apple-
 .mv-f{color:var(--sky)}   .mf-f{background:var(--sky)}
 
 /* ── PAGES ── */
-.pages{flex:1;overflow:hidden;position:relative}
-.page{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 14px 88px;display:none}
+.pages{flex:1;overflow:hidden;position:relative;min-height:0}
+.page{position:absolute;top:0;left:0;right:0;bottom:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 14px 88px;display:none}
 .page.on{display:block}
 
 /* ── BOTTOM NAV ── */
@@ -447,7 +447,15 @@ async function loadFromSupabase() {
   if(water) water.forEach(r=>{ DB.set('water_'+r.date, r.glasses||0); });
   if(game&&game[0]) {
     const g=game[0];
-    DB.set('game',{xp:g.xp||0, achs:g.unlocked_achs||[], lastDate:g.last_date});
+    // Solo actualizar si el XP de Supabase es mayor (evitar perder progreso)
+    const localGame = DB.game();
+    const sbXP = g.xp||0;
+    const finalXP = Math.max(sbXP, localGame.xp||0);
+    // Merge de logros (tomar todos de ambos)
+    const sbAchs = g.unlocked_achs||[];
+    const localAchs = localGame.achs||[];
+    const mergedAchs = [...new Set([...sbAchs,...localAchs])];
+    DB.set('game',{xp:finalXP, achs:mergedAchs, lastDate:g.last_date});
   }
 }
 
@@ -721,6 +729,11 @@ const FOODS=[
 {n:'Huevo revuelto (2 und)',cat:'🍗 Carnes',g:'proteina',p:12,c:1,f:12,k:156,u:'2 huevos con 1 cdita aceite'},
 {n:'Carne molida magra',cat:'🍗 Carnes',g:'proteina',p:18,c:0,f:10,k:162,u:'100g cocida'},
 {n:'Chorizo parrilla',cat:'🍖 Embutidos',g:'proteina',p:8,c:1,f:16,k:181,u:'50g · 1 und mediano'},
+{n:'Albóndigas de res (5 und pequeñas)',cat:'🍱 Preparaciones',g:'proteina',p:18,c:4,f:10,k:178,u:'~120g · 5 und pequeñas'},
+{n:'Arepa de yuca con queso y mantequilla',cat:'🍱 Preparaciones',g:'mixto',p:5,c:22,f:8,k:177,u:'1 arepa + 30g queso + 1 cdita mantequilla'},
+{n:'Salami (3 tajadas)',cat:'🍖 Embutidos',g:'proteina',p:7,c:1,f:10,k:122,u:'~45g · 3 tajadas'},
+{n:'Papa común (½ pequeña)',cat:'🥔 Tubérculos',g:'tuberculo',p:1,c:8,f:0,k:36,u:'35g · ½ papa pequeña'},
+{n:'Morcilla',cat:'🍖 Embutidos',g:'mixto',p:5,c:8,f:12,k:164,u:'50g · 1 und'},
 ];
 
 // ═══════════════════════════════════════════════
@@ -1105,16 +1118,27 @@ function renderHist() {
     const sc=Math.round(Math.min(100,t.p/GOALS.p*100)*.45+Math.min(100,t.k/GOALS.k*100)*.30+Math.min(100,t.c/GOALS.c*100)*.15+Math.min(100,t.f/GOALS.f*100)*.10);
     const col=sc>=75?'var(--mint)':sc>=50?'var(--amber)':'var(--coral)';
     const dt=new Date(date+'T12:00:00');
+    // Build meal detail
+    const mealDetail = MEALS.map(m=>{
+      const entries = d2.meals[m.id]||[];
+      if(!entries.length) return '';
+      const names = entries.map(e=>e.n).join(', ');
+      const mp = entries.reduce((a,x)=>a+(x.p||0),0);
+      return `<div style="font-size:10px;color:var(--sub);margin-top:3px"><span style="color:var(--muted);font-weight:700">${m.icon} ${m.name}:</span> ${names} <span style="color:var(--mint)">(${mp}g P)</span></div>`;
+    }).filter(Boolean).join('');
+    // Sups detail
+    const supDone = SUPS.filter(x=>s[x.id]).map(x=>x.icon).join('');
     return`<div class="hday" onclick="sumDate='${date}';goPage('Resumen',document.querySelectorAll('.nb')[1])">
       <div class="hscore" style="background:${col}1A;color:${col}">${sc}</div>
       <div class="hdinfo">
-        <div class="hddate">${dn[dt.getDay()]} ${dt.getDate()} ${mn[dt.getMonth()]}</div>
-        <div class="hdmacros">💪${Math.round(t.p)}g · 🔥${Math.round(t.k)}kcal · 🌾${Math.round(t.c)}g</div>
+        <div class="hddate">${dn[dt.getDay()]} ${dt.getDate()} ${mn[dt.getMonth()]} <span style="font-size:10px;color:var(--muted);font-weight:400">${supDone}</span></div>
+        <div class="hdmacros">💪${Math.round(t.p)}g · 🔥${Math.round(t.k)}kcal · 🌾${Math.round(t.c)}g · 🥑${Math.round(t.f)}g</div>
         <div class="hdbars">
           <div class="hb"><div class="hbf" style="width:${Math.min(100,t.p/GOALS.p*100).toFixed(0)}%;background:var(--mint)"></div></div>
           <div class="hb"><div class="hbf" style="width:${Math.min(100,t.k/GOALS.k*100).toFixed(0)}%;background:var(--lilac)"></div></div>
           <div class="hb"><div class="hbf" style="width:${Math.min(100,t.c/GOALS.c*100).toFixed(0)}%;background:var(--amber)"></div></div>
         </div>
+        ${mealDetail}
       </div>
     </div>`;
   }).join('');
@@ -1300,15 +1324,25 @@ function init() {
   renderHoy();
   renderSum(sumDate);
 
-  // 2. XP diario
-  const g=DB.game();
-  if(g.lastDate!==TODAY()){g.lastDate=TODAY();DB.set('game',g);saveGame();addXP(5);checkAchs();}
-
-  // 3. Cargar Supabase en segundo plano
+  // 2. Cargar Supabase — PRIMERO, luego dar XP diario
   loadFromSupabase().then(()=>{
+    // XP diario solo después de tener los datos reales de Supabase
+    const g=DB.game();
+    if(g.lastDate!==TODAY()){
+      g.lastDate=TODAY();
+      DB.set('game',g);
+      saveGame();
+      addXP(5);
+      checkAchs();
+    }
     renderHoy();
     renderSum(sumDate);
-  }).catch(()=>{});
+  }).catch(()=>{
+    // Sin conexión: dar XP diario con datos locales
+    const g=DB.game();
+    if(g.lastDate!==TODAY()){g.lastDate=TODAY();DB.set('game',g);addXP(5);checkAchs();}
+    renderHoy();
+  });
 }
 
 init();
