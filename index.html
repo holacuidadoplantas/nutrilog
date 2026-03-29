@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="NutriLog">
 <meta name="theme-color" content="#080810">
-<title>NutriLog · Paola</title>
+<title>NutriLog v3</title>
 
 <style>
 :root{
@@ -1337,6 +1337,140 @@ async function preloadData(){
 //  INIT
 // ══════════════════════════════════════════
 const WATER_GOAL=8;
+
+
+
+// ══════════════════════════════════════════
+//  GAME ENGINE
+// ══════════════════════════════════════════
+function getLevel(xp){
+  for(let i=LEVELS.length-1;i>=0;i--){if(xp>=LEVELS[i].min)return LEVELS[i]}
+  return LEVELS[0];
+}
+
+function getStreak(){
+  const dates=dbAllSync();if(!dates.length)return 0;
+  let streak=0;const today=TODAY();
+  let d=new Date(today+'T12:00:00');
+  for(let i=0;i<60;i++){
+    const ds=d.toISOString().split('T')[0];
+    const data=dbDaySync(ds);
+    const hasFood=Object.values(data.meals).some(e=>e.length>0);
+    if(hasFood){streak++}else if(ds!==today){break}
+    d.setDate(d.getDate()-1);
+  }
+  return streak;
+}
+
+function getStats(){
+  const dates=dbAllSync();
+  let totalEntries=0,proteinGoalDays=0,allSupsDays=0,fullPortionDays=0,prowheyDays=[];
+  dates.forEach(date=>{
+    const data=dbDaySync(date);let p=0;
+    MEALS.forEach(m=>(data.meals[m.id]||[]).forEach(e=>{p+=e.p||0;totalEntries++}));
+    if(p>=GOALS.p*.9)proteinGoalDays++;
+    const sups=dbSupsSync(date);
+    if(SUPS.every(s=>sups[s.id]))allSupsDays++;
+    if(sups['prowhey'])prowheyDays.push(date);
+    let allFull=true;
+    MEALS.forEach(m=>{
+      const entries=data.meals[m.id]||[];
+      m.porciones.forEach(por=>{
+        const cnt=entries.filter(e=>{if(e.grupo)return e.grupo===por.grupo;const f=FOODS.find(fd=>fd.n===e.n);return f&&f.grupo===por.grupo}).length;
+        if(cnt<por.meta)allFull=false;
+      });
+    });
+    if(allFull&&Object.values(data.meals).some(e=>e.length>0))fullPortionDays++;
+  });
+  let prowheyStreak=0;const today=TODAY();let d=new Date(today+'T12:00:00');
+  for(let i=0;i<60;i++){
+    const ds=d.toISOString().split('T')[0];
+    if(prowheyDays.includes(ds)){prowheyStreak++}else if(ds!==today){break}
+    d.setDate(d.getDate()-1);
+  }
+  const streak=getStreak();const gpd=dbGameSync();const lvl=getLevel(gpd.xp);
+  return{totalEntries,proteinGoalDays,allSupsDays,fullPortionDays,prowheyStreak,streak,xp:gpd.xp,level:lvl.lvl};
+}
+
+function updateHdrGame(){
+  const gpd=dbGameSync();const streak=getStreak();const lvl=getLevel(gpd.xp);
+  const nextLvl=LEVELS.find(l=>l.lvl===lvl.lvl+1)||lvl;
+  const pct=lvl.lvl===8?100:Math.round(((gpd.xp-lvl.min)/(nextLvl.min-lvl.min))*100);
+  document.getElementById('streakNum').textContent=streak;
+  document.getElementById('xpNum').textContent=gpd.xp;
+  document.getElementById('levelTag').textContent='Nv'+lvl.lvl+' · '+lvl.name;
+  const lb=document.getElementById('levelBar');if(lb)lb.style.width=pct+'%';
+  const ln=document.getElementById('levelNext');if(ln)ln.textContent=lvl.lvl===8?'¡Máximo!':gpd.xp+' / '+nextLvl.min+' XP';
+}
+
+async function awardXP(amount,label){
+  const gpd=dbGameSync();const oldLvl=getLevel(gpd.xp).lvl;
+  gpd.xp+=amount;await dbSaveGame(gpd);
+  const newLvl=getLevel(gpd.xp).lvl;
+  const pop=document.createElement('div');
+  pop.className='xp-pop';pop.textContent='+'+amount+' XP';
+  pop.style.left=(window.innerWidth/2-30)+'px';pop.style.top=(window.innerHeight/2)+'px';
+  document.body.appendChild(pop);setTimeout(()=>pop.remove(),1000);
+  updateHdrGame();
+  if(newLvl>oldLvl){const ld=getLevel(gpd.xp);setTimeout(()=>celebrate('🎊','¡Subiste de nivel!','Ahora eres: '+ld.name,0),500);}
+  checkAchievements();
+}
+
+async function checkAchievements(){
+  const stats=getStats();const gpd=dbGameSync();
+  for(const ach of ACHIEVEMENTS){
+    if(!gpd.unlockedAchs.includes(ach.id)&&ach.check(stats)){
+      gpd.unlockedAchs.push(ach.id);
+      if(ach.xp>0)gpd.xp+=ach.xp;
+      await dbSaveGame(gpd);updateHdrGame();
+      setTimeout(()=>celebrate(ach.ico,'¡Logro desbloqueado!',ach.name+'\n'+ach.desc,ach.xp),300);
+    }
+  }
+}
+
+let confettiAnim=null;
+function celebrate(emoji,title,msg,xp){
+  const ce=document.getElementById('ctEmoji');if(ce)ce.textContent=emoji;
+  const ct=document.getElementById('ctTitle');if(ct)ct.textContent=title;
+  const cm=document.getElementById('ctMsg');if(cm)cm.textContent=msg;
+  const cx=document.getElementById('ctXp');if(cx)cx.textContent=xp>0?'+'+xp+' XP ✨':'';
+  const toast=document.getElementById('celebToast');if(toast)toast.classList.add('show');
+  launchConfetti();
+}
+function closeCelebration(){
+  const toast=document.getElementById('celebToast');if(toast)toast.classList.remove('show');
+  if(confettiAnim){cancelAnimationFrame(confettiAnim);confettiAnim=null}
+  const cv=document.getElementById('confetti-canvas');
+  if(cv){cv.style.display='none';const ctx=cv.getContext('2d');ctx.clearRect(0,0,cv.width,cv.height);}
+}
+function launchConfetti(){
+  const cv=document.getElementById('confetti-canvas');if(!cv)return;
+  cv.style.display='block';cv.width=window.innerWidth;cv.height=window.innerHeight;
+  const ctx=cv.getContext('2d');
+  const colors=['#64E0A0','#FFB347','#C084FC','#60C4FF','#FF6B6B','#FFD700'];
+  const pieces=Array.from({length:80},()=>({
+    x:Math.random()*cv.width,y:-10,
+    vx:(Math.random()-.5)*4,vy:Math.random()*3+2,
+    color:colors[Math.floor(Math.random()*colors.length)],
+    size:Math.random()*8+4,rot:Math.random()*360,rotv:(Math.random()-.5)*8,
+    shape:Math.random()>.5?'rect':'circle'
+  }));
+  function frame(){
+    ctx.clearRect(0,0,cv.width,cv.height);
+    pieces.forEach(p=>{
+      p.x+=p.vx;p.y+=p.vy;p.rot+=p.rotv;p.vy+=.05;
+      ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rot*Math.PI/180);
+      ctx.fillStyle=p.color;
+      if(p.shape==='circle'){ctx.beginPath();ctx.arc(0,0,p.size/2,0,Math.PI*2);ctx.fill()}
+      else{ctx.fillRect(-p.size/2,-p.size/4,p.size,p.size/2)}
+      ctx.restore();
+    });
+    if(pieces.some(p=>p.y<cv.height+20))confettiAnim=requestAnimationFrame(frame);
+    else cv.style.display='none';
+  }
+  confettiAnim=requestAnimationFrame(frame);
+}
+
 
 
 // ══════════════════════════════════════════
