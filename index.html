@@ -338,6 +338,43 @@ html,body{height:100%;background:var(--ink);color:var(--body);font-family:-apple
 .xp-pop{position:fixed;pointer-events:none;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',system-ui,sans-serif;font-size:22px;color:#FF6B6B;font-weight:900;z-index:500;animation:xpPop .9s ease-out forwards}
 
 @media print{.bnav,.pbtn,.shbtn,.ibar{display:none!important}body{background:#fff!important;color:#000!important}.page{display:block!important;overflow:visible!important;position:static!important}.pages,.app{overflow:visible!important;height:auto!important}}
+
+/* ── MOTIV CARD ── */
+.motiv-card{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;margin-bottom:14px}
+.motiv-emoji{font-size:28px;flex-shrink:0}
+.motiv-msg{font-size:14px;font-weight:700;color:var(--bright);margin-bottom:2px}
+.motiv-sub{font-size:12px;color:var(--sub)}
+/* ── WATER ── */
+.water-block{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 16px;margin-bottom:14px}
+.water-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.water-title{font-size:13px;font-weight:700;color:var(--bright)}
+.water-val{font-size:13px;color:var(--sky);font-weight:700}
+.water-glasses{display:flex;gap:6px;flex-wrap:wrap}
+.wglass{font-size:20px;cursor:pointer;opacity:.25;transition:opacity .2s}
+.wglass.filled{opacity:1}
+/* ── HEATMAP ── */
+.heatmap-row{display:flex;gap:6px;margin-bottom:14px;align-items:flex-end}
+.hcell{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.hbar{width:100%;border-radius:3px;min-height:4px;transition:height .3s}
+.hday-lbl{font-size:9px;color:var(--muted)}
+/* ── PORTION CHIPS ── */
+.portion-line{display:flex;gap:5px;flex-wrap:wrap;padding:8px 12px;border-bottom:1px solid var(--line)}
+.pchip{font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;border:1.5px solid;background:transparent}
+.p-done{font-size:10px;color:var(--mint);font-weight:700;padding:3px 8px}
+/* ── MB SUB ── */
+.mb-sub{font-size:10px;color:var(--muted);margin-left:4px}
+.mbval-wrap{display:flex;flex-direction:column;align-items:flex-end;min-width:60px}
+.mbpct{font-size:10px;color:var(--muted)}
+/* ── ACH GRID ── */
+.ach-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ach-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;text-align:center;position:relative;overflow:hidden}
+.ach-card.unlocked{border-color:var(--gold)}
+.ach-card.locked{opacity:.4;filter:grayscale(.6)}
+.ach-ico{font-size:28px;margin-bottom:6px}
+.ach-name{font-size:12px;font-weight:700;color:var(--bright);margin-bottom:3px}
+.ach-desc{font-size:10px;color:var(--sub);line-height:1.4}
+.ach-badge{position:absolute;top:6px;right:6px;font-size:11px;color:var(--gold);font-weight:700}
+
 </style>
 </head>
 <body>
@@ -1303,243 +1340,84 @@ async function preloadData(){
 // ══════════════════════════════════════════
 const WATER_GOAL=8;
 
-async function init(){
-  // Renderizar inmediatamente con datos locales (localStorage)
-  // para que la app funcione aunque Supabase tarde o falle
-  const localDates=[];
-  for(let i=0;i<localStorage.length;i++){
-    const k=localStorage.key(i);
-    if(k&&k.startsWith('nl_day_')){
-      const date=k.replace('nl_day_','');
-      const data=LS.g('day_'+date);
-      if(data){CACHE.days[date]=data;localDates.push(date);}
-    }
-    if(k&&k.startsWith('nl_sups_')){
-      const date=k.replace('nl_sups_','');
-      const data=LS.g('sups_'+date);
-      if(data)CACHE.sups[date]=data;
-    }
-    if(k&&k.startsWith('nl_water_')){
-      const date=k.replace('nl_water_','');
-      const data=LS.g('water_'+date);
-      if(data!==null)CACHE.water[date]=data;
-    }
-  }
-  if(localDates.length){
-    CACHE.allDates=localDates.sort().reverse();
-    const gLocal=LS.g('game');
-    if(gLocal)CACHE.game=gLocal;
-    const bLocal=LS.g('body');
-    if(bLocal)CACHE.body=bLocal;
-    // Renderizar con datos locales de inmediato
-    updateHdrGame();renderMotiv();renderWater();renderWeekHeatmap();renderT();renderSups();renderS(TODAY());renderH();renderR();
-  } else {
-    document.getElementById('todayMeals').innerHTML=`
-      <div style="text-align:center;padding:40px 20px">
-        <div style="font-size:36px;margin-bottom:12px">⏳</div>
-        <div style="font-size:14px;color:#9EA3AE;font-weight:500">Cargando datos...</div>
-      </div>`;
-  }
 
-  // Luego cargar desde Supabase en segundo plano (timeout 8s)
-  const sbOk = await Promise.race([
-    preloadData().then(()=>true).catch(()=>false),
-    new Promise(res=>setTimeout(()=>res(false),8000))
-  ]);
-
-  // Si allDates no cargó de Supabase, reconstruir desde localStorage
-  if(!CACHE.allDates){
-    const a=[];
-    for(let i=0;i<localStorage.length;i++){
-      const k=localStorage.key(i);
-      if(k&&k.startsWith('nl_day_')){
-        const date=k.replace('nl_day_','');
-        const data=LS.g('day_'+date);
-        if(data){CACHE.days[date]=data;a.push(date);}
-      }
-    }
-    CACHE.allDates=a.sort().reverse();
-  }
-
-  // Re-renderizar con datos de Supabase (si cargó)
-  updateHdrGame();
-  // Test: write directly to motivCard to confirm rendering works
-  try{
-    document.getElementById('motivCard').innerHTML='<div style="background:#D1FAE5;padding:12px 16px;border-radius:12px;font-size:14px;font-weight:700;color:#065F46;margin-bottom:10px">✅ App cargando...</div>';
-  }catch(e){console.error('motivCard error:',e)}
-  try{renderMotiv();}catch(e){
-    console.error('renderMotiv error:',e);
-    document.getElementById('motivCard').innerHTML='<div style="background:#FEE2E2;padding:12px;border-radius:10px;font-size:12px;color:#991B1B">Error renderMotiv: '+e.message+'</div>';
-  }
-  try{renderWater();}catch(e){console.error('renderWater:',e)}
-  renderWeekHeatmap();
-  try{renderT();}catch(e){console.error('renderT error:',e);document.getElementById('todayMeals').innerHTML='<div style="background:#FEE2E2;padding:12px;border-radius:10px;font-size:12px;font-weight:600;color:#991B1B;margin:8px 0">Error: '+e.message+'</div>';}
-  try{renderSups();}catch(e){console.error('renderSups:',e)}
-  renderS(TODAY());
-  renderH();
-  renderR();
-  if(!sbOk){
-    // Mostrar aviso discreto si Supabase no está disponible
-    const tip=document.createElement('div');
-    tip.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#FFF3CD;border:1px solid #FFC107;border-radius:10px;padding:8px 14px;font-size:12px;color:#856404;font-weight:600;z-index:200;white-space:nowrap';
-    tip.textContent='⚠️ Sin conexión — usando datos locales';
-    document.body.appendChild(tip);
-    setTimeout(()=>tip.remove(),4000);
-  }
-
-  // XP diario
-  try{
-    const gd=dbGameSync();
-    if(gd.lastDate!==TODAY()){
-      gd.lastDate=TODAY();
-      dbSaveGame(gd);
-      awardXP(5,'abrir la app hoy');
-    }
-  }catch(e){console.warn(e)}
+// ══════════════════════════════════════════
+//  PROWHEY + dayTotals
+// ══════════════════════════════════════════
+const PROWHEY_MACROS={p:35,k:194,c:8,f:2};
+function dayTotals(date){
+  const data=dbDaySync(date);const sups=dbSupsSync(date);
+  const pw=sups['prowhey']?PROWHEY_MACROS:{p:0,k:0,c:0,f:0};
+  let tot={p:pw.p,k:pw.k,c:pw.c,f:pw.f};
+  MEALS.forEach(m=>(data.meals[m.id]||[]).forEach(e=>{tot.p+=e.p||0;tot.k+=e.k||0;tot.c+=e.c||0;tot.f+=e.f||0}));
+  return tot;
 }
 
 // ══════════════════════════════════════════
-//  GAME ENGINE
+//  MOTIVATIONAL
 // ══════════════════════════════════════════
-function getLevel(xp){
-  for(let i=LEVELS.length-1;i>=0;i--){if(xp>=LEVELS[i].min)return LEVELS[i]}
-  return LEVELS[0];
+const MOTIV_MSGS=[
+  {e:'🌱',t:'¡Hoy es un buen día!',s:'Cada registro cuenta. Tu cuerpo te lo agradece.'},
+  {e:'💚',t:'La constancia es tu superpoder',s:'Pequeños pasos todos los días generan grandes cambios.'},
+  {e:'🌟',t:'¡Bienvenida, Paola!',s:'Hoy tienes otra oportunidad de cuidarte.'},
+  {e:'💪',t:'La racha sigue viva',s:'Tu cuerpo ya está notando la diferencia. No pares ahora.'},
+  {e:'⭐',t:'¡Sigue así!',s:'La consistencia vence al talento. Tú lo estás demostrando.'},
+];
+function getMotivMsg(streak){
+  if(streak>=30)return{e:'🏆',t:'¡Un mes imparable, Paola!',s:'30 días de constancia. Eres una campeona de verdad.'};
+  if(streak>=14)return{e:'👑',t:'¡Dos semanas seguidas!',s:'Ya es un hábito real. Tu masa muscular te lo va a agradecer.'};
+  if(streak>=7)return{e:'⭐',t:'¡Una semana completa!',s:'7 días de constancia — eso separa el deseo del resultado.'};
+  if(streak>=3)return{e:'🔥',t:`¡Llevas ${streak} días seguidos!`,s:'Estás construyendo el hábito. ¡Sigue así!'};
+  return MOTIV_MSGS[new Date().getHours()%MOTIV_MSGS.length];
 }
-function getStreak(){
-  const dates=dbAllSync();if(!dates.length)return 0;
-  let streak=0;
-  const today=TODAY();
-  let d=new Date(today+'T12:00:00');
-  for(let i=0;i<60;i++){
+function renderMotiv(){
+  const streak=getStreak();const m=getMotivMsg(streak);
+  document.getElementById('motivCard').innerHTML=`
+    <div class="motiv-card">
+      <div class="motiv-emoji">${m.e}</div>
+      <div><div class="motiv-msg">${m.t}</div><div class="motiv-sub">${m.s}</div></div>
+    </div>`;
+}
+
+// ══════════════════════════════════════════
+//  WATER TRACKER
+// ══════════════════════════════════════════
+function getWater(){return dbWaterSync(TODAY())}
+async function setWater(n){await dbSaveWater(TODAY(),n);renderWater();}
+function renderWater(){
+  const w=getWater();const goal=WATER_GOAL;
+  let glasses='';
+  for(let i=0;i<goal;i++){
+    const filled=i<w;
+    glasses+=`<div class="wglass ${filled?'filled':''}" onclick="setWater(${filled?i:i+1})" title="${filled?'Quitar':'Agregar'} vaso">💧</div>`;
+  }
+  document.getElementById('waterBlock').innerHTML=`
+    <div class="water-block">
+      <div class="water-head"><span class="water-title">💧 Agua</span><span class="water-val">${w} / ${goal} vasos</span></div>
+      <div class="water-glasses">${glasses}</div>
+    </div>`;
+}
+
+// ══════════════════════════════════════════
+//  WEEK HEATMAP
+// ══════════════════════════════════════════
+function renderWeekHeatmap(){
+  const days=[];const today=TODAY();
+  for(let i=6;i>=0;i--){
+    const d=new Date(today+'T12:00:00');d.setDate(d.getDate()-i);
     const ds=d.toISOString().split('T')[0];
-    const data=dbDaySync(ds);
-    const hasFood=Object.values(data.meals).some(e=>e.length>0);
-    if(hasFood){streak++}else if(ds!==today){break}
-    d.setDate(d.getDate()-1);
+    const tot=dayTotals(ds);
+    const pct=Math.min(100,Math.round(tot.p/GOALS.p*100));
+    days.push({ds,pct,d});
   }
-  return streak;
-}
-function getStats(){
-  const dates=dbAllSync();
-  let totalEntries=0,proteinGoalDays=0,allSupsDays=0,fullPortionDays=0,prowheyDays=[];
-  dates.forEach(date=>{
-    const data=dbDaySync(date);
-    let p=0;
-    MEALS.forEach(m=>(data.meals[m.id]||[]).forEach(e=>{p+=e.p||0;totalEntries++}));
-    if(p>=GOALS.p*.9)proteinGoalDays++;
-    const sups=dbSupsSync(date);
-    if(SUPS.every(s=>sups[s.id]))allSupsDays++;
-    if(sups['prowhey'])prowheyDays.push(date);
-    let allFull=true;
-    MEALS.forEach(m=>{
-      const entries=data.meals[m.id]||[];
-      m.porciones.forEach(por=>{
-        const cnt=entries.filter(e=>FOODS.find(f=>f.n===e.n&&f.grupo===por.grupo)).length;
-        if(cnt<por.meta)allFull=false;
-      });
-    });
-    if(allFull&&Object.values(data.meals).some(e=>e.length>0))fullPortionDays++;
-  });
-  let prowheyStreak=0;
-  const today=TODAY();let d=new Date(today+'T12:00:00');
-  for(let i=0;i<60;i++){
-    const ds=d.toISOString().split('T')[0];
-    if(prowheyDays.includes(ds)){prowheyStreak++}else if(ds!==today){break}
-    d.setDate(d.getDate()-1);
-  }
-  const streak=getStreak();
-  const gp=dbGameSync();
-  const lvl=getLevel(gp.xp);
-  return{totalEntries,proteinGoalDays,allSupsDays,fullPortionDays,prowheyStreak,streak,xp:gp.xp,level:lvl.lvl};
-}
-
-async function awardXP(amount,label,x,y){
-  const gp=dbGameSync();
-  const oldLvl=getLevel(gp.xp).lvl;
-  gp.xp+=amount;
-  await dbSaveGame(gp);
-  const newLvl=getLevel(gp.xp).lvl;
-  const pop=document.createElement('div');
-  pop.className='xp-pop';
-  pop.textContent='+'+amount+' XP';
-  pop.style.left=(x||window.innerWidth/2-30)+'px';
-  pop.style.top=(y||window.innerHeight/2)+'px';
-  document.body.appendChild(pop);
-  setTimeout(()=>pop.remove(),1000);
-  updateHdrGame();
-  if(newLvl>oldLvl){
-    const lvlData=getLevel(gp.xp);
-    setTimeout(()=>celebrate('🎊','¡Subiste de nivel!',`Ahora eres: ${lvlData.name}`,0),500);
-  }
-  checkAchievements();
-}
-
-async function checkAchievements(){
-  const stats=getStats();
-  const gp=dbGameSync();
-  for(const ach of ACHIEVEMENTS){
-    if(!gp.unlockedAchs.includes(ach.id)&&ach.check(stats)){
-      gp.unlockedAchs.push(ach.id);
-      if(ach.xp>0)gp.xp+=ach.xp;
-      await dbSaveGame(gp);
-      updateHdrGame();
-      setTimeout(()=>celebrate(ach.ico,'¡Logro desbloqueado!',ach.name+'\n'+ach.desc,ach.xp),300);
-    }
-  }
-}
-
-let confettiAnim=null;
-function celebrate(emoji,title,msg,xp){
-  document.getElementById('ctEmoji').textContent=emoji;
-  document.getElementById('ctTitle').textContent=title;
-  document.getElementById('ctMsg').textContent=msg;
-  document.getElementById('ctXp').textContent=xp>0?'+'+xp+' XP ✨':'';
-  document.getElementById('celebToast').classList.add('show');
-  launchConfetti();
-}
-function closeCelebration(){
-  document.getElementById('celebToast').classList.remove('show');
-  if(confettiAnim){cancelAnimationFrame(confettiAnim);confettiAnim=null}
-  const cv=document.getElementById('confetti-canvas');
-  cv.style.display='none';
-  const ctx=cv.getContext('2d');ctx.clearRect(0,0,cv.width,cv.height);
-}
-function launchConfetti(){
-  const cv=document.getElementById('confetti-canvas');
-  cv.style.display='block';
-  cv.width=window.innerWidth;cv.height=window.innerHeight;
-  const ctx=cv.getContext('2d');
-  const colors=['#64E0A0','#FFB347','#C084FC','#60C4FF','#FF6B6B','#FFD700'];
-  const pieces=Array.from({length:80},()=>({
-    x:Math.random()*cv.width,y:-10,
-    vx:(Math.random()-0.5)*4,vy:Math.random()*3+2,
-    color:colors[Math.floor(Math.random()*colors.length)],
-    size:Math.random()*8+4,rot:Math.random()*360,rotv:(Math.random()-0.5)*8,
-    shape:Math.random()>.5?'rect':'circle'
-  }));
-  function frame(){
-    ctx.clearRect(0,0,cv.width,cv.height);
-    pieces.forEach(p=>{
-      p.x+=p.vx;p.y+=p.vy;p.rot+=p.rotv;p.vy+=0.05;
-      ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rot*Math.PI/180);
-      ctx.fillStyle=p.color;
-      if(p.shape==='circle'){ctx.beginPath();ctx.arc(0,0,p.size/2,0,Math.PI*2);ctx.fill()}
-      else{ctx.fillRect(-p.size/2,-p.size/4,p.size,p.size/2)}
-      ctx.restore();
-    });
-    if(pieces.some(p=>p.y<cv.height+20))confettiAnim=requestAnimationFrame(frame);
-    else{cv.style.display='none'}
-  }
-  confettiAnim=requestAnimationFrame(frame);
-}
-
-function updateHdrGame(){
-  const gp=dbGameSync();const streak=getStreak();
-  const lvl=getLevel(gp.xp);
-  document.getElementById('streakNum').textContent=streak;
-  document.getElementById('xpNum').textContent=gp.xp;
-  document.getElementById('levelTag').textContent='Nv'+lvl.lvl;
-  // level bar removed from header
+  const dn=['D','L','M','M','J','V','S'];
+  document.getElementById('weekHeatmap').innerHTML=`
+    <div class="heatmap-row">
+      ${days.map(d=>{
+        const col=d.pct>=85?'var(--mint)':d.pct>=50?'var(--amber)':d.pct>0?'var(--coral)':'var(--line)';
+        return`<div class="hcell"><div class="hbar" style="background:${col};height:${Math.max(4,d.pct*.4)}px"></div><div class="hday-lbl">${dn[d.d.getDay()]}</div></div>`;
+      }).join('')}
+    </div>`;
 }
 
 // ══════════════════════════════════════════
@@ -1559,82 +1437,45 @@ function gp(n,btn){
 // ══════════════════════════════════════════
 //  TODAY
 // ══════════════════════════════════════════
-
-// ── Helper: macros totales del día incluyendo Prowhey de suplementos ──
-const PROWHEY_MACROS = {p:35, k:194, c:8, f:2};
-function dayTotals(date){
-  const data = dbDaySync(date);
-  const sups = dbSupsSync(date);
-  const pw = sups['prowhey'] ? PROWHEY_MACROS : {p:0,k:0,c:0,f:0};
-  let tot = {p:pw.p, k:pw.k, c:pw.c, f:pw.f};
-  MEALS.forEach(m=>(data.meals[m.id]||[]).forEach(e=>{
-    tot.p+=e.p||0; tot.k+=e.k||0; tot.c+=e.c||0; tot.f+=e.f||0;
-  }));
-  return tot;
-}
-
 function renderT(){
-  const data=dbDaySync(TODAY());
-  const sups=dbSupsSync(TODAY());
-  let tot=dayTotals(TODAY()),h='';
-  // recalcular sin meals para no duplicar — el helper ya incluye meals
-  // revertir tot a solo prowhey y recalcular
+  const data=dbDaySync(TODAY());const sups=dbSupsSync(TODAY());
   const pw=sups['prowhey']?PROWHEY_MACROS:{p:0,k:0,c:0,f:0};
-  tot={p:pw.p,k:pw.k,c:pw.c,f:pw.f};
-
+  let tot={p:pw.p,k:pw.k,c:pw.c,f:pw.f},h='';
   MEALS.forEach(m=>{
     const entries=data.meals[m.id]||[];
     entries.forEach(x=>{tot.p+=x.p||0;tot.k+=x.k||0;tot.c+=x.c||0;tot.f+=x.f||0});
     const has=entries.length>0;
-
-    // calc portions — busca primero por grupo guardado, luego por nombre en FOODS
     const portionStatus=m.porciones.map(por=>{
       const cnt=entries.filter(e=>{
-        // Si la entrada tiene grupo guardado, usarlo directamente
         if(e.grupo)return e.grupo===por.grupo;
-        // Fallback: buscar en FOODS por nombre
-        const f=FOODS.find(fd=>fd.n===e.n);
-        return f&&f.grupo===por.grupo;
+        const f=FOODS.find(fd=>fd.n===e.n);return f&&f.grupo===por.grupo;
       }).length;
       return{...por,cnt:Math.min(cnt,por.meta)};
     });
     const allComplete=portionStatus.every(p=>p.cnt>=p.meta);
-    const totalDots=portionStatus.reduce((a,p)=>a+p.meta,0);
     const filledDots=portionStatus.reduce((a,p)=>a+p.cnt,0);
-
-    // portion chips — compact single line
+    const totalDots=portionStatus.reduce((a,p)=>a+p.meta,0);
     let pillsHtml='';
     portionStatus.forEach(por=>{
       const done=por.cnt>=por.meta;
-      const partial=por.cnt>0&&!done;
-      const col=done?'var(--prot)':partial?'var(--amber)':'var(--line2)';
-      const txtCol=done?'var(--prot)':partial?'var(--amber)':'var(--muted)';
-      pillsHtml+=`<span class="pchip" style="border-color:${col};color:${txtCol}" title="${por.label}: ${por.cnt}/${por.meta}">${done?'✓':por.cnt+'/'+por.meta} ${por.label}</span>`;
+      const col=done?'var(--mint)':por.cnt>0?'var(--amber)':'var(--line2)';
+      pillsHtml+=`<span class="pchip" style="border-color:${col};color:${col}">${done?'✓':por.cnt+'/'+por.meta} ${por.label}</span>`;
     });
-    let dotsHtml='';
-
     h+=`<div class="mblock">
       <div class="mhead">
         <div class="mpill ${has?'has':''}"><span class="dot"></span>${m.icon} ${m.name}</div>
         <span class="mtag">${m.time}</span>
       </div>
       <div class="mcard">
-        <div class="portion-line">
-          ${pillsHtml}
-          ${allComplete?'<span class="p-done">✓ Completo</span>':''}
-        </div>
+        <div class="portion-line">${pillsHtml}${allComplete?'<span class="p-done">✓ Completo</span>':''}</div>
         ${!has?'<div class="emeal">Sin registros aún</div>':entries.map((x,i)=>{
           const fd=FOODS.find(f=>f.n===x.n);
           return`<div class="erow">
-            <div>
-              <div class="ename">${x.n}</div>
-              ${fd?`<div class="ecat">${fd.cat}</div>`:''}
-            </div>
+            <div><div class="ename">${x.n}</div>${fd?`<div class="ecat">${fd.cat}</div>`:''}</div>
             <div class="etags">
-              <span class="tag tp" title="Proteína">${x.p}g P</span>
-              <span class="tag tk" title="Calorías">${x.k}kcal</span>
-              <span class="tag tc" title="Carbohidratos">${x.c}g C</span>
-              <span class="tag tf" title="Grasas">${x.f||0}g G</span>
+              <span class="tag tp">${x.p}g P</span>
+              <span class="tag tk">${x.k}kcal</span>
+              <span class="tag tc">${x.c}g C</span>
             </div>
             <button class="xbtn" onclick="delE('${m.id}',${i})">×</button>
           </div>`;
@@ -1644,44 +1485,28 @@ function renderT(){
         <span class="tchip">💪 ${entries.reduce((a,x)=>a+(x.p||0),0)}g prot</span>
         <span class="tchip">🔥 ${entries.reduce((a,x)=>a+(x.k||0),0)} kcal</span>
         <span class="tchip">🌾 ${entries.reduce((a,x)=>a+(x.c||0),0)}g carb</span>
-        ${allComplete?'<span class="tchip" style="border-color:var(--mint);color:var(--mint)">🎯 ¡Porciones completas!</span>':''}
       </div>`:''}
       <button class="abtn" onclick="openM('${m.id}','${m.name}')">＋ Agregar a ${m.name}</button>
-      ${m.drink?`<div class="drink-reminder">💧 <strong>Bebida</strong> después de esta comida · ${m.drink}</div>`:''}
+      ${m.drink?`<div class="drink-reminder">💧 Bebida después de esta comida · ${m.drink}</div>`:''}
     </div>`;
   });
-  // Add clear button at bottom of meals
-  h+=`<div style="margin:8px 0 20px">
-    <button onclick="clearToday()" style="width:100%;background:#FFF0F0;border:1.5px solid #FCA5A5;border-radius:14px;padding:14px;color:#EF4444;font-size:14px;font-weight:600;cursor:pointer;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',system-ui,sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s">
-      🗑️ Borrar registro de hoy
-    </button>
-  </div>`;
   document.getElementById('todayMeals').innerHTML=h;
   upH(tot);
 }
 
 function upH(t){
-  document.getElementById('hP').textContent=t.p;
-  document.getElementById('hK').textContent=t.k;
-  document.getElementById('hC').textContent=t.c;
-  document.getElementById('hF').textContent=t.f;
-  const pPct=Math.min(100,t.p/GOALS.p*100);
-  const kPct=Math.min(100,t.k/GOALS.k*100);
-  const cPct=Math.min(100,t.c/GOALS.c*100);
-  const fPct=Math.min(100,t.f/GOALS.f*100);
-  document.getElementById('hPb').style.width=pPct+'%';
-  document.getElementById('hKb').style.width=kPct+'%';
-  document.getElementById('hCb').style.width=cPct+'%';
-  document.getElementById('hFb').style.width=fPct+'%';
-  // color shift when over goal
-  document.getElementById('hPb').style.background=pPct>=100?'var(--prot)':'var(--prot)';
-  document.getElementById('hKb').style.background=kPct>=100?'var(--coral)':'var(--kcal)';
+  document.getElementById('hP').textContent=Math.round(t.p);
+  document.getElementById('hK').textContent=Math.round(t.k);
+  document.getElementById('hC').textContent=Math.round(t.c);
+  document.getElementById('hF').textContent=Math.round(t.f);
+  document.getElementById('hPb').style.width=Math.min(100,t.p/GOALS.p*100)+'%';
+  document.getElementById('hKb').style.width=Math.min(100,t.k/GOALS.k*100)+'%';
+  document.getElementById('hCb').style.width=Math.min(100,t.c/GOALS.c*100)+'%';
+  document.getElementById('hFb').style.width=Math.min(100,t.f/GOALS.f*100)+'%';
 }
 async function delE(mid,i){
-  const d=dbDaySync(TODAY());
-  d.meals[mid].splice(i,1);
-  await dbSaveDay(TODAY(),d);
-  renderT();
+  const d=dbDaySync(TODAY());d.meals[mid].splice(i,1);
+  await dbSaveDay(TODAY(),d);renderT();
 }
 
 // ── SUPPLEMENTS ──
@@ -1699,7 +1524,7 @@ function renderSups(){
         <div class="sup-row ${checked[s.id]?'done':''}" onclick="toggleSup('${s.id}')">
           <div class="sup-check">${checked[s.id]?'✓':''}</div>
           <div class="sup-info">
-            <div class="sup-name">${s.icon} ${s.name}${s.id==='prowhey'?`<span style="font-size:11px;margin-left:8px;color:${checked[s.id]?'var(--prot)':'var(--amber)'}">${checked[s.id]?'✓ +35g P · +194kcal incluidos':'⚠️ márcalo para sumar 35g proteína'}</span>`:''}</div>
+            <div class="sup-name">${s.icon} ${s.name}${s.id==='prowhey'?`<span style="font-size:11px;margin-left:8px;color:${checked[s.id]?'var(--mint)':'var(--amber)'}">${checked[s.id]?'✓ +35g P incluidos':'⚠️ márcalo para sumar proteína'}</span>`:''}</div>
             <div class="sup-when">${s.when}</div>
             <div class="sup-dose">${s.dose}</div>
           </div>
@@ -1707,18 +1532,14 @@ function renderSups(){
     </div>`;
 }
 async function toggleSup(id){
-  const data=dbSupsSync(TODAY());
-  const wasChecked=!!data[id];
-  data[id]=!wasChecked;
-  await dbSaveSups(TODAY(),data);
+  const data=dbSupsSync(TODAY());const wasChecked=!!data[id];
+  data[id]=!wasChecked;await dbSaveSups(TODAY(),data);
   if(!wasChecked){
     awardXP(id==='prowhey'?15:5,'suplemento tomado');
-    if(SUPS.every(s=>data[s.id])){
-      setTimeout(()=>celebrate('💊','¡Suplementos completos!','Todos los suplementos del día tomados — ¡así se hace!',20),200);
-    }
+    if(SUPS.every(s=>data[s.id]))setTimeout(()=>celebrate('💊','¡Suplementos completos!','¡Todos los suplementos del día tomados!',20),200);
     checkAchievements();
   }
-  renderSups();
+  renderSups();renderT();
 }
 
 // ── MODAL ──
@@ -1783,52 +1604,20 @@ async function addEntry(entry){
   if(!curMeal)return;
   const data=dbDaySync(TODAY());
   if(!data.meals[curMeal])data.meals[curMeal]=[];
-  const wasEmpty=data.meals[curMeal].length===0;
   data.meals[curMeal].push(entry);
   await dbSaveDay(TODAY(),data);
   closeM();
   const baseXP=entry.grupo==='proteina'?12:entry.grupo==='verdura'?10:entry.grupo==='fruta'?8:5;
   awardXP(baseXP,'alimento registrado');
-  if(wasEmpty&&curMeal==='breakfast')checkAchievements();
-  const meal=MEALS.find(m=>m.id===curMeal);
-  const entries=data.meals[curMeal];
-  const allComplete=meal.porciones.every(por=>{
-    const cnt=entries.filter(e=>{
-      if(e.grupo)return e.grupo===por.grupo;
-      const f=FOODS.find(fd=>fd.n===e.n);
-      return f&&f.grupo===por.grupo;
-    }).length;
-    return cnt>=por.meta;
-  });
-  if(allComplete&&entries.length===meal.porciones.reduce((a,p)=>a+p.meta,0)){
-    setTimeout(()=>celebrate('🎯','¡'+meal.icon+' '+meal.name+' completo!','Todas las porciones recomendadas cubierta — ¡perfecto!',25),300);
-    checkAchievements();
-  }
-  checkDayComplete(data);
+  checkAchievements();
   renderT();
 }
-async function checkDayComplete(data){
-  let dayComplete=true;
-  MEALS.forEach(m=>{
-    const entries=data.meals[m.id]||[];
-    m.porciones.forEach(por=>{
-      const cnt=entries.filter(e=>{
-        if(e.grupo)return e.grupo===por.grupo;
-        const f=FOODS.find(fd=>fd.n===e.n);
-        return f&&f.grupo===por.grupo;
-      }).length;
-      if(cnt<por.meta)dayComplete=false;
-    });
-  });
-  if(dayComplete){
-    const gd=dbGameSync();
-    if(!gd['dayComplete_'+TODAY()]){
-      gd['dayComplete_'+TODAY()]=true;
-      await dbSaveGame(gd);
-      setTimeout(()=>celebrate('🌟','¡Día completo!','¡Todas las porciones del plan cubiertas hoy!\nEres una campeona 💚',50),500);
-      checkAchievements();
-    }
-  }
+
+// ── CLEAR TODAY ──
+async function clearToday(){
+  if(!confirm('¿Borrar todos los registros de hoy?'))return;
+  const d={meals:{breakfast:[],morning:[],lunch:[],afternoon:[],dinner:[]}};
+  await dbSaveDay(TODAY(),d);renderT();
 }
 
 // ══════════════════════════════════════════
@@ -1846,9 +1635,7 @@ function renderS(date){
   document.getElementById('sdlbl').textContent=`${DN[dt.getDay()]} ${dt.getDate()} ${MN[dt.getMonth()]}`;
   const supChecked=dbSupsSync(date);
   const tot=dayTotals(date);
-  let allE={};
-  MEALS.forEach(m=>{const e=data.meals[m.id]||[];allE[m.id]=e;});
-  const has=Object.values(allE).some(e=>e.length>0)||supChecked['prowhey'];
+  const has=Object.values(data.meals).some(e=>e.length>0)||supChecked['prowhey'];
   if(!has){document.getElementById('sumC').innerHTML='<div class="empty"><div class="eico">📭</div><div class="etxt">Sin registros para este día.<br>Ve a <strong>Hoy</strong> y agrega tus comidas.</div></div>';return}
   const sc=Math.round(Math.min(100,tot.p/GOALS.p*100)*.45+Math.min(100,tot.k/GOALS.k*100)*.30+Math.min(100,tot.c/GOALS.c*100)*.15+Math.min(100,tot.f/GOALS.f*100)*.10);
   const cls=sc>=75?'great':sc>=50?'good':'poor';
@@ -1858,16 +1645,15 @@ function renderS(date){
   else fbs.push({c:'bad',t:'❌ Proteína insuficiente',m:`${tot.p}g de ${GOALS.p}g — déficit de ${GOALS.p-tot.p}g.`});
   if(tot.k>=GOALS.k*.85&&tot.k<=GOALS.k*1.1)fbs.push({c:'great',t:'✅ Calorías en rango',m:`${tot.k} kcal de ${GOALS.k} establecidas.`});
   else if(tot.k<GOALS.k*.7)fbs.push({c:'warn',t:'⚠️ Calorías muy bajas',m:`${tot.k} kcal — comer poco aumenta la pérdida muscular.`});
-  else if(tot.k>GOALS.k*1.15)fbs.push({c:'warn',t:'⚠️ Calorías por encima',m:`${tot.k} kcal — ${tot.k-GOALS.k} kcal sobre la meta.`});
   const supDone=SUPS.filter(s=>supChecked[s.id]).length;
   if(supDone===SUPS.length)fbs.push({c:'great',t:'✅ Todos los suplementos tomados',m:'Prowhey, Vitamina D3, Omega 3, Bariatric Fusion y Creatina — ¡perfecto!'});
   else if(supChecked['prowhey'])fbs.push({c:'warn',t:'⚠️ Suplementos incompletos',m:`Prowhey ✓ · ${supDone} de ${SUPS.length} tomados.`});
   else fbs.push({c:'bad',t:'❌ Prowhey no registrado',m:'Sin el Prowhey es muy difícil llegar a los 90g de proteína.'});
   const macros=[
-    {nm:'Proteína',  sub:'meta 90g',  v:tot.p,g:GOALS.p,u:'g',   col:'var(--prot)'},
-    {nm:'Calorías',  sub:'meta 1650', v:tot.k,g:GOALS.k,u:'kcal',col:'var(--kcal)'},
-    {nm:'Carbohid.', sub:'meta 145g', v:tot.c,g:GOALS.c,u:'g',   col:'var(--carb)'},
-    {nm:'Grasas',    sub:'meta 58g',  v:tot.f,g:GOALS.f,u:'g',   col:'var(--gras)'},
+    {nm:'Proteína',v:tot.p,g:GOALS.p,u:'g',col:'var(--mint)'},
+    {nm:'Calorías',v:tot.k,g:GOALS.k,u:'kcal',col:'var(--lilac)'},
+    {nm:'Carbohid.',v:tot.c,g:GOALS.c,u:'g',col:'var(--amber)'},
+    {nm:'Grasas',v:tot.f,g:GOALS.f,u:'g',col:'var(--sky)'},
   ];
   const scoreMsg=sc>=75?'✨ ¡Excelente! Plan bien cumplido.':sc>=50?'👍 Buen día, hay áreas de mejora.':'⚠️ Día difícil — mañana es otra oportunidad.';
   document.getElementById('sumC').innerHTML=`
@@ -1876,20 +1662,13 @@ function renderS(date){
       <div class="smsg">${scoreMsg}</div>
     </div>
     <div class="mbars">${macros.map(m=>{
-  const pct=Math.min(100,Math.round(m.v/m.g*100));
-  const ok=pct>=85&&pct<=115;
-  const over=pct>115;
-  const barColor=over?'var(--coral)':m.col;
-  return`<div class="mbrow">
-    <div class="mbn">${m.nm}<span class="mb-sub">${m.sub}</span></div>
-    <div class="mbtrack"><div class="mbfill" style="width:${pct}%;background:${barColor}"></div></div>
-    <div class="mbval-wrap">
-      <span class="mbval" style="color:${barColor}">${m.v}${m.u}${ok?' ✓':over?' ▲':''}</span>
-      <span class="mbpct">${pct}% de meta</span>
-    </div>
-  </div>`;
-}).join('')}</div>
-    <div class="mdet"><div class="mdh">Detalle por tiempo de comida</div>${MEALS.map(m=>{const e=allE[m.id]||[];if(!e.length)return'';const mp=e.reduce((a,x)=>a+(x.p||0),0),mk=e.reduce((a,x)=>a+(x.k||0),0);return`<div class="mdm"><div class="mdmn">${m.icon} ${m.name} — ${mp}g prot · ${mk} kcal</div><div class="mdmi">${e.map(x=>x.n).join(' · ')}</div></div>`}).join('')}</div>
+      const pct=Math.min(100,Math.round(m.v/m.g*100));
+      return`<div class="mbrow">
+        <div class="mbn">${m.nm}</div>
+        <div class="mbtrack"><div class="mbfill" style="width:${pct}%;background:${m.col}"></div></div>
+        <div class="mbval" style="color:${m.col}">${Math.round(m.v)}${m.u}</div>
+      </div>`;
+    }).join('')}</div>
     ${fbs.map(f=>`<div class="fbcard ${f.c}"><div class="fbt ${f.c}">${f.t}</div><div class="fbm">${f.m}</div></div>`).join('')}`;
 }
 
@@ -1897,32 +1676,25 @@ function renderS(date){
 //  LOGROS
 // ══════════════════════════════════════════
 function renderLogros(){
-  const gp=dbGameSync();
-  const stats=getStats();
-  const streak=getStreak();
-  const lvl=getLevel(gp.xp);
-  const unlocked=gp.unlockedAchs||[];
+  const gpd=dbGameSync();const stats=getStats();const streak=getStreak();
+  const lvl=getLevel(gpd.xp);const unlocked=gpd.unlockedAchs||[];
   document.getElementById('logrosContent').innerHTML=`
-    <div style="background:linear-gradient(135deg,#FFFBEB,#FFF);border:1.5px solid #FDE68A;border-radius:var(--r);padding:18px;margin-bottom:18px;text-align:center;box-shadow:0 2px 12px rgba(0,0,0,.06)">
+    <div style="background:linear-gradient(135deg,rgba(255,215,0,.1),rgba(192,132,252,.08));border:1px solid rgba(255,215,0,.25);border-radius:var(--r);padding:18px;margin-bottom:18px;text-align:center">
       <div style="font-size:36px;margin-bottom:6px">${lvl.name.split(' ')[1]||'🌱'}</div>
-      <div style="font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',system-ui,sans-serif;font-size:22px;font-weight:800;color:#92400E">${lvl.name}</div>
-      <div style="font-size:13px;color:#6B7280;margin-top:4px">${gp.xp} XP total · Racha de ${streak} días 🔥</div>
+      <div style="font-size:22px;color:var(--gold);font-weight:700">${lvl.name}</div>
+      <div style="font-size:13px;color:var(--sub);margin-top:4px">${gpd.xp} XP · Racha de ${streak} días 🔥</div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:14px">
-        <div style="background:#F9FAFB;border-radius:10px;padding:10px;border:1px solid #E5E7EB">
-          <div style="font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',system-ui,sans-serif;font-size:20px;font-weight:800;color:#FF6B6B">${streak}</div>
-          <div style="font-size:11px;color:#9EA3AE">Racha</div>
+        <div style="background:rgba(255,255,255,.04);border-radius:10px;padding:10px">
+          <div style="font-size:20px;color:var(--mint)">${streak}</div><div style="font-size:11px;color:var(--muted)">Racha</div>
         </div>
-        <div style="background:#F9FAFB;border-radius:10px;padding:10px;border:1px solid #E5E7EB">
-          <div style="font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',system-ui,sans-serif;font-size:20px;font-weight:800;color:#A569BD">${gp.xp}</div>
-          <div style="font-size:11px;color:#9EA3AE">XP total</div>
+        <div style="background:rgba(255,255,255,.04);border-radius:10px;padding:10px">
+          <div style="font-size:20px;color:var(--lilac)">${gpd.xp}</div><div style="font-size:11px;color:var(--muted)">XP total</div>
         </div>
-        <div style="background:#F9FAFB;border-radius:10px;padding:10px;border:1px solid #E5E7EB">
-          <div style="font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',system-ui,sans-serif;font-size:20px;font-weight:800;color:#D97706">${unlocked.length}</div>
-          <div style="font-size:11px;color:#9EA3AE">Logros</div>
+        <div style="background:rgba(255,255,255,.04);border-radius:10px;padding:10px">
+          <div style="font-size:20px;color:var(--gold)">${unlocked.length}</div><div style="font-size:11px;color:var(--muted)">Logros</div>
         </div>
       </div>
     </div>
-    <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px">Logros (${unlocked.length} / ${ACHIEVEMENTS.length})</div>
     <div class="ach-grid">
       ${ACHIEVEMENTS.map(a=>{
         const isUnlocked=unlocked.includes(a.id);
@@ -1931,7 +1703,6 @@ function renderLogros(){
           <div class="ach-name">${a.name}</div>
           <div class="ach-desc">${isUnlocked?a.desc:'???'}</div>
           ${isUnlocked&&a.xp>0?`<div class="ach-badge">+${a.xp}XP</div>`:''}
-          ${isUnlocked?'<div style="position:absolute;top:0;left:0;right:0;height:3px;background:#F5A623;border-radius:var(--r) var(--r) 0 0"></div>':''}
         </div>`;
       }).join('')}
     </div>`;
@@ -1943,8 +1714,10 @@ function renderLogros(){
 function setHF(f,btn){hFilter=f;document.querySelectorAll('.fil').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderH()}
 function renderH(){
   let dates=dbAllSync();const co=new Date(TODAY());
-  if(hFilter==='7')co.setDate(co.getDate()-7);else if(hFilter==='30')co.setDate(co.getDate()-30);
-  else if(hFilter==='90')co.setDate(co.getDate()-90);else co.setFullYear(2000);
+  if(hFilter==='7')co.setDate(co.getDate()-7);
+  else if(hFilter==='30')co.setDate(co.getDate()-30);
+  else if(hFilter==='90')co.setDate(co.getDate()-90);
+  else co.setFullYear(2000);
   dates=dates.filter(d=>d>=co.toISOString().split('T')[0]);
   const cd=dates.slice(0,14).reverse();
   const cdata=cd.map(d=>{const t=dayTotals(d);return{d,p:t.p}});
@@ -1958,9 +1731,7 @@ function renderH(){
   if(!dates.length){list.innerHTML='<div class="empty"><div class="eico">📭</div><div class="etxt">Sin registros en este período</div></div>';return}
   const dn=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'],mn=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
   list.innerHTML=dates.map(date=>{
-    const tot=dayTotals(date);
-    const data=dbDaySync(date);
-    const sups=dbSupsSync(date);
+    const tot=dayTotals(date);const data=dbDaySync(date);const sups=dbSupsSync(date);
     const hasFood=Object.values(data.meals).some(e=>e.length>0)||sups['prowhey'];
     if(!hasFood)return'';
     const sc=Math.round(Math.min(100,tot.p/GOALS.p*100)*.45+Math.min(100,tot.k/GOALS.k*100)*.30+Math.min(100,tot.c/GOALS.c*100)*.15+Math.min(100,tot.f/GOALS.f*100)*.10);
@@ -1970,7 +1741,7 @@ function renderH(){
       <div class="hdscore" style="background:${col}18;color:${col}">${sc}</div>
       <div class="hdinfo">
         <div class="hddate">${dn[dt.getDay()]} ${dt.getDate()} ${mn[dt.getMonth()]}</div>
-        <div class="hdm">💪${tot.p}g · 🔥${tot.k}kcal · 🌾${tot.c}g</div>
+        <div class="hdm">💪${Math.round(tot.p)}g · 🔥${Math.round(tot.k)}kcal · 🌾${Math.round(tot.c)}g</div>
         <div class="hdbars">
           <div class="hb"><div class="hbf" style="width:${Math.min(100,tot.p/GOALS.p*100).toFixed(0)}%;background:var(--mint)"></div></div>
           <div class="hb"><div class="hbf" style="width:${Math.min(100,tot.k/GOALS.k*100).toFixed(0)}%;background:var(--lilac)"></div></div>
@@ -1982,27 +1753,34 @@ function renderH(){
 }
 
 // ══════════════════════════════════════════
+//  BODY
+// ══════════════════════════════════════════
+function renderBody(){
+  document.getElementById('bodyContent').innerHTML=`
+    <div style="background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;text-align:center">
+      <div style="font-size:32px;margin-bottom:8px">⚖️</div>
+      <div style="font-size:14px;color:var(--sub)">Registro de medidas próximamente</div>
+    </div>`;
+}
+
+// ══════════════════════════════════════════
 //  REPORT
 // ══════════════════════════════════════════
 function renderR(){
   const dates=dbAllSync();
   const has=dates.some(d=>Object.values(dbDaySync(d).meals).some(e=>e.length>0));
   if(!has){document.getElementById('repC').innerHTML='<div class="empty"><div class="eico">📋</div><div class="etxt">El informe aparece aquí una vez que registres tus primeras comidas.</div></div>';return}
-  let dl=0,tp=0,tk=0,tc=0,tf=0,mp=0,mk=0;const add=[];
+  let dl=0,tp=0,tk=0,tc=0,tf=0,mp=0;const add=[];
   dates.forEach(date=>{
-    const tot=dayTotals(date);
-    const data=dbDaySync(date);
-    const sups=dbSupsSync(date);
+    const tot=dayTotals(date);const data=dbDaySync(date);const sups=dbSupsSync(date);
     const hasFood=Object.values(data.meals).some(e=>e.length>0)||sups['prowhey'];
-    if(hasFood){dl++;tp+=tot.p;tk+=tot.k;tc+=tot.c;tf+=tot.f;if(tot.p>=GOALS.p*.85)mp++;if(tot.k>=GOALS.k*.85&&tot.k<=GOALS.k*1.1)mk++;add.push({date,p:tot.p,k:tot.k,c:tot.c,f:tot.f})}
+    if(hasFood){dl++;tp+=tot.p;tk+=tot.k;tc+=tot.c;tf+=tot.f;if(tot.p>=GOALS.p*.85)mp++;add.push({date,p:tot.p,k:tot.k})}
   });
-  const avgP=dl?Math.round(tp/dl):0,avgK=dl?Math.round(tk/dl):0,avgC=dl?Math.round(tc/dl):0,avgF=dl?Math.round(tf/dl):0;
-  const pcP=dl?Math.round(mp/dl*100):0,pcK=dl?Math.round(mk/dl*100):0;
-  if(!dates.length)return;
-  const fd=new Date(dates[dates.length-1]+'T12:00:00'),ld=new Date(dates[0]+'T12:00:00');
+  const avgP=dl?Math.round(tp/dl):0,avgK=dl?Math.round(tk/dl):0;
+  const pcP=dl?Math.round(mp/dl*100):0;
+  const streak=getStreak();const gpd=dbGameSync();const lvl=getLevel(gpd.xp);
   const MN=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
-  const DN=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
-  const gd=dbGameSync();const streak=getStreak();const lvl=getLevel(gd.xp);
+  const fd=new Date(dates[dates.length-1]+'T12:00:00'),ld=new Date(dates[0]+'T12:00:00');
   document.getElementById('repC').innerHTML=`
     <div class="rtop">
       <div class="rtname">Informe Nutricional</div>
@@ -2020,417 +1798,58 @@ function renderR(){
       <div class="sbox"><div class="sv" style="color:${pcP>=75?'var(--mint)':'var(--amber)'}">${pcP}%</div><div class="sl">Meta prot.</div></div>
     </div>
     <div class="rsec">
-      <div class="rsh">Promedios vs. metas</div>
-      ${[{n:'Proteína (meta 90g)',v:avgP+'g',ok:avgP>=GOALS.p*.85},{n:'Calorías (meta 1.650)',v:avgK+' kcal',ok:avgK>=GOALS.k*.85&&avgK<=GOALS.k*1.1},{n:'Carbohidratos (145g)',v:avgC+'g',ok:avgC>=GOALS.c*.7&&avgC<=GOALS.c*1.2},{n:'Grasas (meta 58g)',v:avgF+'g',ok:avgF>=GOALS.f*.7&&avgF<=GOALS.f*1.2},{n:'Adherencia proteína',v:pcP+'%',ok:pcP>=75}].map(r=>`<div class="rsr"><span>${r.n}</span><span class="rsv" style="color:${r.ok?'var(--mint)':'var(--amber)'}">${r.v} ${r.ok?'✓':'⚠️'}</span></div>`).join('')}
+      <div class="rsh">Últimos ${Math.min(10,add.length)} días</div>
+      ${add.slice(0,10).map(d=>{const dt=new Date(d.date+'T12:00:00');const dn2=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];return`<div class="rsr"><span>${dn2[dt.getDay()]} ${dt.getDate()}/${dt.getMonth()+1}</span><span style="font-size:11px;color:var(--sub)">💪${Math.round(d.p)}g · 🔥${Math.round(d.k)}kcal</span><span class="rsv" style="color:${d.p>=GOALS.p*.85?'var(--mint)':'var(--amber)'}">${d.p>=GOALS.p*.85?'✓':'⚠️'}</span></div>`}).join('')}
     </div>
     <div class="rsec">
       <div class="rsh">Progreso en NutriLog</div>
       <div class="rsr"><span>Nivel actual</span><span class="rsv" style="color:var(--gold)">${lvl.name}</span></div>
-      <div class="rsr"><span>XP total</span><span class="rsv" style="color:var(--lilac)">${gd.xp} XP</span></div>
-      <div class="rsr"><span>Logros desbloqueados</span><span class="rsv" style="color:var(--amber)">${(gd.unlockedAchs||[]).length} / ${ACHIEVEMENTS.length}</span></div>
-      <div class="rsr"><span>Racha máxima registrada</span><span class="rsv" style="color:var(--coral)">${streak} días 🔥</span></div>
-    </div>
-    <div class="rsec">
-      <div class="rsh">Últimos ${Math.min(10,add.length)} días</div>
-      ${add.slice(0,10).map(d=>{const dt=new Date(d.date+'T12:00:00');return`<div class="rsr"><span>${DN[dt.getDay()]} ${dt.getDate()}/${dt.getMonth()+1}</span><span style="font-size:11px;color:var(--sub)">💪${d.p}g · 🔥${d.k}kcal</span><span class="rsv" style="color:${d.p>=GOALS.p*.85?'var(--mint)':'var(--amber)'}">${d.p>=GOALS.p*.85?'✓':'⚠️'}</span></div>`}).join('')}
+      <div class="rsr"><span>XP total</span><span class="rsv" style="color:var(--lilac)">${gpd.xp} XP</span></div>
+      <div class="rsr"><span>Racha actual</span><span class="rsv" style="color:var(--amber)">${streak} días 🔥</span></div>
     </div>
     <button class="pbtn" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
-    <button class="shbtn" onclick="cpRep()" style="margin-bottom:8px">📋 Copiar resumen para WhatsApp</button>
-    <button class="shbtn" onclick="exportData()" style="margin-bottom:8px;color:var(--mint);border-color:var(--mint)">💾 Exportar mis datos (backup)</button>
-    <label class="shbtn" style="display:block;text-align:center;cursor:pointer;margin-bottom:0">
-      📂 Importar datos (restaurar)
-      <input type="file" accept=".json" style="display:none" onchange="importData(event)">
-    </label>
-    <div id="cpOk" style="display:none;text-align:center;color:var(--mint);font-size:13px;margin-top:8px;padding:6px">✓ Copiado al portapapeles</div>`;
+    <button class="shbtn" onclick="cpRep()" style="margin-top:8px">📋 Copiar resumen para WhatsApp</button>
+    <div id="cpOk" style="display:none;text-align:center;color:var(--mint);font-size:13px;margin-top:8px">✓ Copiado</div>`;
 }
 function cpRep(){
-  const dates=dbAllSync();let dl=0,tp=0,tk=0,mp=0;
-  dates.forEach(date=>{const tot=dayTotals(date);const d=dbDaySync(date);const s=dbSupsSync(date);if(Object.values(d.meals).some(e=>e.length>0)||s['prowhey']){dl++;tp+=tot.p;tk+=tot.k;if(tot.p>=GOALS.p*.85)mp++}});
-  const avgP=dl?Math.round(tp/dl):0,avgK=dl?Math.round(tk/dl):0,pct=dl?Math.round(mp/dl*100):0;
-  const gd=dbGameSync();const lvl=getLevel(gd.xp);const streak=getStreak();
-  navigator.clipboard.writeText(`📊 INFORME NUTRICIONAL — Paola Gaviria V.\n\nPeríodo: ${dl} días registrados\nProteína promedio: ${avgP}g / 90g meta\nCalorías promedio: ${avgK} kcal / 1650 meta\nMeta proteína alcanzada: ${pct}% de los días\nRacha actual: ${streak} días 🔥\nNivel NutriLog: ${lvl.name} (${gd.xp} XP)\n\nPlan prescrito por: Angie Stephania Burbano Q. · Nutricionista Deportiva`).then(()=>{const m=document.getElementById('cpOk');m.style.display='block';setTimeout(()=>m.style.display='none',2500)});
+  const dates=dbAllSync();let dl=0,tp=0,mp=0;
+  dates.forEach(date=>{const tot=dayTotals(date);const d=dbDaySync(date);const s=dbSupsSync(date);if(Object.values(d.meals).some(e=>e.length>0)||s['prowhey']){dl++;tp+=tot.p;if(tot.p>=GOALS.p*.85)mp++}});
+  const avgP=dl?Math.round(tp/dl):0,pct=dl?Math.round(mp/dl*100):0;
+  const gpd=dbGameSync();const lvl=getLevel(gpd.xp);const streak=getStreak();
+  navigator.clipboard.writeText(`📊 INFORME NUTRICIONAL — Paola Gaviria V.\n\nDías registrados: ${dl}\nProteína promedio: ${avgP}g / 90g meta\nAdherencia proteína: ${pct}% de los días\nRacha actual: ${streak} días 🔥\nNivel NutriLog: ${lvl.name} (${gpd.xp} XP)\n\nPlan: Angie Stephania Burbano Q. · Nutricionista Deportiva`).then(()=>{const m=document.getElementById('cpOk');m.style.display='block';setTimeout(()=>m.style.display='none',2500)});
 }
 
-// ══════════════════════════════════════════
-//  MOTIVATIONAL MESSAGES
-// ══════════════════════════════════════════
-const MOTIV_BY_STREAK = [
-  {min:0,  msgs:[
-    {e:'🌱',t:'¡Hoy es un buen día para empezar!',s:'Cada registro cuenta. Tu cuerpo te lo agradece.'},
-    {e:'💚',t:'La constancia es tu superpoder',s:'Pequeños pasos todos los días generan grandes cambios.'},
-    {e:'🌟',t:'¡Bienvenida de nuevo, Paola!',s:'Hoy tienes otra oportunidad de cuidarte. ¡Aprovéchala!'},
-  ]},
-  {min:3,  msgs:[
-    {e:'🔥',t:'¡Llevas '+'{streak}'+' días seguidos!',s:'Estás construyendo el hábito. ¡Sigue así!'},
-    {e:'💪',t:'La racha sigue viva',s:'Tu cuerpo ya está notando la diferencia. No pares ahora.'},
-  ]},
-  {min:7,  msgs:[
-    {e:'⭐',t:'¡Una semana completa!',s:'7 días de constancia — eso es lo que separa el deseo del resultado.'},
-    {e:'🚀',t:'¡Imparable!',s:'Semana entera registrando. Tu nutricionista estaría orgullosa.'},
-  ]},
-  {min:14, msgs:[
-    {e:'👑',t:'¡Dos semanas seguidas!',s:'Ya es un hábito real. Tu masa muscular te lo va a agradecer.'},
-    {e:'🌈',t:'14 días de compromiso',s:'Estás combatiendo la sarcopenia con cada registro. ¡Eso es poder!'},
-  ]},
-  {min:30, msgs:[
-    {e:'🏆',t:'¡Un mes imparable, Paola!',s:'30 días de constancia. Eres una campeona de verdad.'},
-  ]},
-];
 
-function getMotivMsg(streak){
-  let pool=MOTIV_BY_STREAK[0].msgs;
-  for(let i=MOTIV_BY_STREAK.length-1;i>=0;i--){
-    if(streak>=MOTIV_BY_STREAK[i].min){pool=MOTIV_BY_STREAK[i].msgs;break}
-  }
-  const m=pool[new Date().getHours()%pool.length];
-  return{...m,t:m.t.replace('{streak}',streak)};
-}
 
-function renderMotiv(){
-  const streak=getStreak();
-  const m=getMotivMsg(streak);
-  document.getElementById('motivCard').innerHTML=`
-    <div class="motiv-card">
-      <div class="motiv-emoji">${m.e}</div>
-      <div><div class="motiv-msg">${m.t}</div><div class="motiv-sub">${m.s}</div></div>
-    </div>`;
-}
-
-// ══════════════════════════════════════════
-//  WATER TRACKER
-// ══════════════════════════════════════════
-function getWater(){return dbWaterSync(TODAY())}
-async function setWater(n){await dbSaveWater(TODAY(),n)}
-
-function renderWater(){
-  const w=getWater();
-  const pct=Math.round((w/WATER_GOAL)*100);
-  let glasses='';
-  for(let i=0;i<WATER_GOAL;i++){
-    glasses+=`<span class="wglass ${i<w?'filled':''}" onclick="setWaterTo(${i+1})">💧</span>`;
-  }
-  document.getElementById('waterBlock').innerHTML=`
-    <div class="water-block">
-      <div class="water-head">
-        <div class="water-title">💧 Agua del día</div>
-        <div class="water-count">${w} / ${WATER_GOAL} <span style="font-size:13px;color:var(--muted)">vasos</span></div>
-      </div>
-      <div class="water-glasses">${glasses}</div>
-      <div class="water-btns">
-        <button class="w-add" onclick="addWater()">+ 1 vaso</button>
-        <button class="w-rem" onclick="removeWater()">−</button>
-      </div>
-      <div class="water-tip">${w>=WATER_GOAL?'✅ ¡Meta de agua alcanzada! +:5 XP':w>=4?`Vas bien — faltan ${WATER_GOAL-w} vasos más`:'Recuerda tomar agua en pequeños sorbos frecuentes'}</div>
-    </div>`;
-}
-
-async function setWaterTo(n){
-  const prev=getWater();
-  await setWater(Math.max(0,Math.min(WATER_GOAL,n)));
-  if(n>=WATER_GOAL&&prev<WATER_GOAL){awardXP(5,'meta de agua')}
-  renderWater();
-}
-async function addWater(){
-  const prev=getWater();
-  const next=Math.min(WATER_GOAL,prev+1);
-  await setWater(next);
-  if(next>=WATER_GOAL&&prev<WATER_GOAL){awardXP(5,'meta de agua');setTimeout(()=>celebrate('💧','¡Meta de agua alcanzada!','8 vasos de agua hoy — tu cuerpo lo nota 💚',5),200)}
-  renderWater();
-}
-async function removeWater(){await setWater(Math.max(0,getWater()-1));renderWater()}
-
-// ══════════════════════════════════════════
-//  WEEKLY HEATMAP
-// ══════════════════════════════════════════
-function renderWeekHeatmap(){
-  const today=new Date();
-  const grupos=['proteina','cereal','tuberculo','fruta','verdura','grasa','lacteo'];
-  const grupoLabel={'proteina':'💪Prot','cereal':'🍚Cereal','tuberculo':'🥔Tubér','fruta':'🍊Fruta','verdura':'🥦Verd','grasa':'🥑Grasa','lacteo':'🥛Lácteo'};
-  // Get last 7 days
-  const days=[];
-  for(let i=6;i>=0;i--){
-    const d=new Date(today);d.setDate(d.getDate()-i);
-    days.push(d.toISOString().split('T')[0]);
-  }
-  const dayNames=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
-
-  let thead='<tr><th></th>'+days.map(d=>{const dt=new Date(d+'T12:00:00');return`<th>${dayNames[dt.getDay()]}<br><span style="font-size:9px;opacity:.6">${dt.getDate()}</span></th>`}).join('')+'</tr>';
-  let tbody='';
-  grupos.forEach(grupo=>{
-    let row=`<tr><td style="font-size:10px;color:var(--muted);padding-right:6px;white-space:nowrap;text-align:right">${grupoLabel[grupo]}</td>`;
-    days.forEach(date=>{
-      const data=dbDaySync(date);
-      let cnt=0;
-      MEALS.forEach(m=>{
-        const por=m.porciones.find(p=>p.grupo===grupo);
-        if(por){
-          const entries=data.meals[m.id]||[];
-          cnt+=entries.filter(e=>{
-            if(e.grupo)return e.grupo===grupo;
-            const f=FOODS.find(fd=>fd.n===e.n);
-            return f&&f.grupo===grupo;
-          }).length;
-        }
-      });
-      const meta=MEALS.reduce((a,m)=>{const p=m.porciones.find(p=>p.grupo===grupo);return a+(p?p.meta:0)},0);
-      let cls='wc-none',txt='';
-      if(meta>0){
-        const ratio=cnt/meta;
-        if(ratio===0)cls='wc-none';
-        else if(ratio<0.5)cls='wc-low';
-        else if(ratio<1)cls='wc-mid';
-        else if(ratio===1)cls='wc-good';
-        else cls='wc-full';
-        txt=cnt>0?cnt:'';
-      } else {cls='wc-none';txt='—'}
-      row+=`<td class="${cls}" title="${grupoLabel[grupo]} · ${date}">${txt}</td>`;
-    });
-    row+='</tr>';
-    tbody+=row;
-  });
-
-  document.getElementById('weekHeatmap').innerHTML=`
-    <div class="week-section">
-      <div class="week-title">📅 Porciones esta semana</div>
-      <div class="week-grid-wrap">
-        <table class="week-table"><thead>${thead}</thead><tbody>${tbody}</tbody></table>
-      </div>
-      <div class="week-legend">
-        <div class="wleg"><div class="wleg-dot" style="background:rgba(255,107,107,.3)"></div>Poco</div>
-        <div class="wleg"><div class="wleg-dot" style="background:rgba(255,179,71,.3)"></div>Medio</div>
-        <div class="wleg"><div class="wleg-dot" style="background:rgba(100,224,160,.3)"></div>Meta</div>
-        <div class="wleg"><div class="wleg-dot" style="background:rgba(100,224,160,.5)"></div>Excedido</div>
-      </div>
-    </div>`;
-}
-
-// ══════════════════════════════════════════
-//  BODY METRICS
-// ══════════════════════════════════════════
-function getBodyRecords(){return dbBodySync()}
-function saveBodyRecords(r){CACHE.body=r;LS.s('body',r)}
-
-function renderBody(){
-  const records=getBodyRecords();
-  const last=records[records.length-1]||null;
-  const prev=records[records.length-2]||null;
-
-  function diff(a,b,key,reverse){
-    if(!a||!b||a[key]==null||b[key]==null)return'';
-    const d=(a[key]-b[key]).toFixed(1);
-    const better=reverse?d<0:d>0;
-    const col=better?'var(--mint)':'var(--coral)';
-    const sign=d>0?'+':'';
-    return`<span style="font-size:11px;color:${col};margin-left:5px">${sign}${d}</span>`;
-  }
-
-  // mini SVG weight chart
-  let chartHtml='';
-  if(records.filter(r=>r.peso).length>=2){
-    const pts=records.filter(r=>r.peso).slice(-10);
-    const vals=pts.map(r=>parseFloat(r.peso));
-    const mn2=Math.min(...vals)-1,mx=Math.max(...vals)+1;
-    const W=300,H=70;
-    const xStep=W/(pts.length-1);
-    const toY=v=>H-((v-mn2)/(mx-mn2))*H;
-    const path=pts.map((p,i)=>`${i===0?'M':'L'}${Math.round(i*xStep)},${Math.round(toY(parseFloat(p.peso)))}`).join(' ');
-    chartHtml=`<div class="body-chart">
-      <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
-        <defs><linearGradient id="wg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#64E0A0" stop-opacity=".3"/><stop offset="100%" stop-color="#64E0A0" stop-opacity="0"/></linearGradient></defs>
-        <path d="${path} L${Math.round((pts.length-1)*xStep)},${H} L0,${H} Z" fill="url(#wg)"/>
-        <path d="${path}" fill="none" stroke="var(--mint)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        ${pts.map((p,i)=>`<circle cx="${Math.round(i*xStep)}" cy="${Math.round(toY(parseFloat(p.peso)))}" r="3" fill="var(--mint)"/>`).join('')}
-      </svg>
-    </div>`;
-  }
-
-  document.getElementById('bodyContent').innerHTML=`
-    <div class="body-hero">
-      <div class="body-hero-title">⚖️ Mi cuerpo</div>
-      <div class="body-hero-sub">Seguimiento semanal · Meta: recomposición corporal</div>
-      <div class="body-stats-row">
-        <div class="bstat">
-          <div class="bstat-val" style="color:var(--mint)">${last&&last.peso?last.peso+'kg':'—'}${last&&prev?diff(last,prev,'peso',true):''}</div>
-          <div class="bstat-lbl">Peso</div>
-        </div>
-        <div class="bstat">
-          <div class="bstat-val" style="color:var(--amber)">${last&&last.grasa?last.grasa+'%':'—'}${last&&prev?diff(last,prev,'grasa',true):''}</div>
-          <div class="bstat-lbl">% Grasa</div>
-        </div>
-        <div class="bstat">
-          <div class="bstat-val" style="color:var(--lilac)">${last&&last.cintura?last.cintura+'cm':'—'}${last&&prev?diff(last,prev,'cintura',true):''}</div>
-          <div class="bstat-lbl">Cintura</div>
-        </div>
-      </div>
-      ${chartHtml?`<div style="margin-top:14px"><div style="font-size:10px;color:var(--muted);margin-bottom:4px;text-align:left">Peso (kg)</div>${chartHtml}</div>`:''}
-    </div>
-
-    <div class="body-form">
-      <div class="body-form-title">Registrar medidas de hoy</div>
-      <div class="body-inputs">
-        <div class="body-inp-wrap">
-          <label class="body-inp-label">Peso (kg)</label>
-          <input class="body-inp" type="number" id="bPeso" placeholder="63.2" step="0.1" min="30" max="200">
-        </div>
-        <div class="body-inp-wrap">
-          <label class="body-inp-label">% Grasa (si tienes)</label>
-          <input class="body-inp" type="number" id="bGrasa" placeholder="35.2" step="0.1" min="5" max="60">
-        </div>
-        <div class="body-inp-wrap">
-          <label class="body-inp-label">Cintura (cm)</label>
-          <input class="body-inp" type="number" id="bCintura" placeholder="78.8" step="0.5" min="40" max="150">
-        </div>
-        <div class="body-inp-wrap">
-          <label class="body-inp-label">Dinamometría (kg)</label>
-          <input class="body-inp" type="number" id="bDino" placeholder="15.2" step="0.1" min="0" max="80">
-        </div>
-      </div>
-      <button class="body-save" onclick="saveBodyRecord()">💾 Guardar medidas</button>
-    </div>
-
-    ${records.length>0?`
-    <div class="body-history">
-      <div class="body-hist-head">Historial de medidas</div>
-      ${records.slice().reverse().slice(0,10).map(r=>{
-        const dt=new Date(r.date+'T12:00:00');
-        const dn=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
-        const mn=['ene','feb','mar','abr','may','jun'];
-        return`<div class="body-hist-row">
-          <div class="bhr-date">${dn[dt.getDay()]} ${dt.getDate()} ${['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'][dt.getMonth()]}</div>
-          <div class="bhr-vals">
-            ${r.peso?`<div class="bhr-v"><div class="bhr-vv" style="color:var(--mint)">${r.peso}kg</div><div class="bhr-vl">Peso</div></div>`:''}
-            ${r.grasa?`<div class="bhr-v"><div class="bhr-vv" style="color:var(--amber)">${r.grasa}%</div><div class="bhr-vl">Grasa</div></div>`:''}
-            ${r.cintura?`<div class="bhr-v"><div class="bhr-vv" style="color:var(--lilac)">${r.cintura}cm</div><div class="bhr-vl">Cintura</div></div>`:''}
-            ${r.dino?`<div class="bhr-v"><div class="bhr-vv" style="color:var(--sky)">${r.dino}kg</div><div class="bhr-vl">Dino</div></div>`:''}
-          </div>
-        </div>`;
-      }).join('')}
-    </div>`:''}
-
-    <div style="background:rgba(255,179,71,.08);border:1px solid rgba(255,179,71,.2);border-radius:var(--r);padding:14px 16px;font-size:12px;color:var(--sub);line-height:1.6">
-      <strong style="color:var(--amber)">💡 Recuerda:</strong> Tu objetivo no es solo bajar la báscula — es ganar músculo y perder grasa. El peso puede mantenerse igual mientras tu composición mejora. 
-      Medidas iniciales (9 mar 2026): 63.2kg · 35.2% grasa · 78.8cm cintura · 15.2kg dino
-    </div>`;
-}
-
-async function saveBodyRecord(){
-  const peso=document.getElementById('bPeso').value;
-  const grasa=document.getElementById('bGrasa').value;
-  const cintura=document.getElementById('bCintura').value;
-  const dino=document.getElementById('bDino').value;
-  if(!peso&&!grasa&&!cintura&&!dino){alert('Ingresa al menos una medida');return}
-  const rec={
-    date:TODAY(),
-    peso:peso?parseFloat(peso):null,
-    grasa:grasa?parseFloat(grasa):null,
-    cintura:cintura?parseFloat(cintura):null,
-    dino:dino?parseFloat(dino):null,
-  };
-  await dbAddBody(rec);
-  awardXP(15,'registro de medidas');
-  setTimeout(()=>celebrate('⚖️','¡Medidas guardadas!','Cada registro te acerca a entender tu progreso real',15),200);
-  renderBody();
-}
-// ══════════════════════════════════════════
-//  BORRAR REGISTRO DEL DÍA
-// ══════════════════════════════════════════
-async function clearToday(){
-  const dn=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
-  const mn=['enero','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
-  const now=new Date(new Date().getTime()-5*60*60*1000);
-  const dayName=dn[now.getDay()]+' '+now.getDate()+' de '+mn[now.getMonth()];
-  if(!confirm('¿Borrar TODO el registro de hoy (' + dayName + ')? Se eliminarán comidas, suplementos y agua. No se puede deshacer.'))return;
-  const today=TODAY();
-  const emptyDay={meals:{breakfast:[],morning:[],lunch:[],afternoon:[],dinner:[]}};
-  // 1. Limpiar cache en memoria
-  CACHE.days[today]=emptyDay;
-  CACHE.sups[today]={};
-  CACHE.water[today]=0;
-  if(CACHE.allDates){
-    CACHE.allDates=CACHE.allDates.filter(d=>d!==today);
-  }
-  // 2. Limpiar localStorage completamente para hoy
-  try{
-    LS.del('day_'+today);
-    LS.del('sups_'+today);
-    LS.del('water_'+today);
-  }catch(e){}
-  // 3. Limpiar Supabase
-  try{
-    await sbFetch('/rest/v1/nl_days?user_key=eq.'+SB_USER+'&date=eq.'+today,'DELETE');
-    await sbFetch('/rest/v1/nl_sups?user_key=eq.'+SB_USER+'&date=eq.'+today,'DELETE');
-    await sbFetch('/rest/v1/nl_water?user_key=eq.'+SB_USER+'&date=eq.'+today,'DELETE');
-  }catch(e){console.warn('SB clear error:',e);}
-  // 4. Re-renderizar todo
+function init(){
+  updateHdrGame();
   renderMotiv();
   renderWater();
   renderWeekHeatmap();
-  try{renderT();}catch(e){console.error('renderT error:',e);document.getElementById('todayMeals').innerHTML='<div style="background:#FEE2E2;padding:12px;border-radius:10px;font-size:12px;font-weight:600;color:#991B1B;margin:8px 0">Error: '+e.message+'</div>';}
-  try{renderSups();}catch(e){console.error('renderSups:',e)}
-  renderS(today);
-}
-
-// ══════════════════════════════════════════
-//  EXPORTAR / IMPORTAR DATOS
-// ══════════════════════════════════════════
-function exportData(){
-  const data={version:1,exported:new Date().toISOString(),days:{},sups:{},water:{},game:null,body:[]};
-  for(let i=0;i<localStorage.length;i++){
-    const k=localStorage.key(i);
-    if(!k||!k.startsWith('nl_'))continue;
-    try{
-      const v=JSON.parse(localStorage.getItem(k));
-      const key=k.replace('nl_','');
-      if(key.startsWith('day_'))data.days[key.replace('day_','')]=v;
-      else if(key.startsWith('sups_'))data.sups[key.replace('sups_','')]=v;
-      else if(key.startsWith('water_'))data.water[key.replace('water_','')]=v;
-      else if(key==='game')data.game=v;
-      else if(key==='body')data.body=v;
-    }catch(e){}
+  renderT();
+  renderSups();
+  renderS(TODAY());
+  renderH();
+  renderR();
+  // XP diario
+  const gd=dbGameSync();
+  if(gd.lastDate!==TODAY()){
+    gd.lastDate=TODAY();
+    dbSaveGame(gd);
+    awardXP(5,'abrir la app hoy');
   }
-  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  a.href=url;
-  a.download='nutrilog_backup_'+TODAY()+'.json';
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-function importData(event){
-  const file=event.target.files[0];
-  if(!file)return;
-  const reader=new FileReader();
-  reader.onload=function(e){
-    try{
-      const data=JSON.parse(e.target.result);
-      if(!data.version){alert('Archivo inválido');return}
-      // Restaurar days
-      Object.entries(data.days||{}).forEach(([date,v])=>{
-        localStorage.setItem('nl_day_'+date,JSON.stringify(v));
-        CACHE.days[date]=v;
-      });
-      // Restaurar sups
-      Object.entries(data.sups||{}).forEach(([date,v])=>{
-        localStorage.setItem('nl_sups_'+date,JSON.stringify(v));
-        CACHE.sups[date]=v;
-      });
-      // Restaurar water
-      Object.entries(data.water||{}).forEach(([date,v])=>{
-        localStorage.setItem('nl_water_'+date,JSON.stringify(v));
-        CACHE.water[date]=v;
-      });
-      // Restaurar game
-      if(data.game){localStorage.setItem('nl_game',JSON.stringify(data.game));CACHE.game=data.game}
-      // Restaurar body
-      if(data.body){localStorage.setItem('nl_body',JSON.stringify(data.body));CACHE.body=data.body}
-      // Reconstruir allDates
-      CACHE.allDates=Object.keys(data.days).filter(d=>Object.values(data.days[d].meals||{}).some(e=>e.length>0)).sort().reverse();
-      alert('✅ Datos restaurados correctamente');
-      location.reload();
-    }catch(err){alert('Error al importar: '+err.message)}
-  };
-  reader.readAsText(file);
+  // Cargar Supabase en segundo plano sin bloquear UI
+  preloadData().then(()=>{
+    updateHdrGame();
+    renderMotiv();
+    renderWater();
+    renderWeekHeatmap();
+    renderT();
+    renderSups();
+    renderS(TODAY());
+    renderH();
+    renderR();
+  }).catch(e=>console.warn('Supabase offline:',e));
 }
 
 // PWA
