@@ -7,26 +7,43 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="NutriLog">
 <meta name="theme-color" content="#0A0A14">
-<title>NutriLog v2 · Paola</title>
+<title>NutriLog · Paola</title>
 <style>
 :root {
-  --bg:     #F0F2F7;
-  --bg2:    #FFFFFF;
-  --bg3:    #E8EBF2;
-  --card:   #FFFFFF;
-  --raise:  #F4F5FA;
-  --line:   #D8DCE8;
-  --line2:  #C0C6D8;
-  --muted:  #7A8299;
-  --sub:    #4A5270;
-  --body:   #2D3452;
-  --bright: #0D1225;
-  --mint:   #059669;
-  --amber:  #D97706;
-  --coral:  #DC2626;
-  --sky:    #2563EB;
-  --lilac:  #7C3AED;
-  --gold:   #B45309;
+  /* ── Fondos ── */
+  --bg:    #F8F9FB;
+  --bg2:   #FFFFFF;
+  --bg3:   #EEF0F5;
+  --card:  #FFFFFF;
+  --raise: #F4F5F8;
+  --line:  #E4E7EF;
+  --line2: #C9CDD9;
+
+  /* ── Texto (escala slate) ── */
+  --muted:  #94A0B8;
+  --sub:    #596280;
+  --body:   #2E3550;
+  --bright: #111827;
+
+  /* ── Macros: cada uno con su identidad ── */
+  --prot:  #0F766E;   /* teal  — proteína */
+  --kcal:  #C2410C;   /* naranja oscuro — calorías */
+  --carb:  #6D28D9;   /* índigo — carbohidratos */
+  --fat:   #1E63B0;   /* azul  — grasas */
+
+  /* ── Semánticos ── */
+  --success: #0D9488;  /* teal claro — logros/metas */
+  --warn:    #B45309;  /* ámbar — advertencia */
+  --danger:  #C53030;  /* rojo sobrio — error */
+  --gold:    #A16207;  /* dorado — logros/XP */
+
+  /* ── Aliases para compatibilidad ── */
+  --mint:   var(--success);
+  --amber:  var(--warn);
+  --coral:  var(--danger);
+  --sky:    var(--fat);
+  --lilac:  var(--carb);
+
   --r: 14px;
   --rs: 10px;
 }
@@ -41,11 +58,11 @@ html,body{height:100%;background:var(--bg);color:var(--body);font-family:-apple-
 .hdr{flex-shrink:0;background:var(--bg2);border-bottom:1px solid var(--line);padding:10px 16px 12px;box-shadow:0 1px 6px rgba(0,0,0,.06)}
 .hdr-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
 .logo{font-size:20px;font-weight:800;color:var(--bright);letter-spacing:-.5px}
-.logo span{color:var(--mint)}
+.logo span{color:var(--prot)}
 .badges{display:flex;gap:8px;align-items:center}
 .badge{display:flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:13px;font-weight:700}
-.badge-streak{background:#FEF3C7;border:1px solid #F59E0B;color:#92400E}
-.badge-xp{background:#EDE9FE;border:1px solid #A78BFA;color:#5B21B6}
+.badge-streak{background:#FFF7ED;border:1px solid #F59E0B;color:#92400E}
+.badge-xp{background:#F5F0FF;border:1px solid #8B5CF6;color:#4C1D95}
 .macro-row{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
 .macro{background:var(--bg3);border:1px solid var(--line);border-radius:var(--rs);padding:8px 10px}
 .macro-lbl{font-size:9px;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
@@ -54,10 +71,10 @@ html,body{height:100%;background:var(--bg);color:var(--body);font-family:-apple-
 .macro-meta{font-size:10px;color:var(--muted);font-weight:500}
 .macro-bar{height:5px;background:var(--line);border-radius:3px;margin-top:6px;overflow:hidden}
 .macro-fill{height:100%;border-radius:3px;transition:width .4s}
-.mv-p{color:var(--mint)} .mf-p{background:var(--mint)}
-.mv-k{color:var(--lilac)} .mf-k{background:var(--lilac)}
-.mv-c{color:var(--amber)} .mf-c{background:var(--amber)}
-.mv-f{color:var(--sky)}   .mf-f{background:var(--sky)}
+.mv-p{color:var(--prot)} .mf-p{background:var(--prot)}
+.mv-k{color:var(--kcal)} .mf-k{background:var(--kcal)}
+.mv-c{color:var(--carb)} .mf-c{background:var(--carb)}
+.mv-f{color:var(--fat)}  .mf-f{background:var(--fat)}
 
 /* ── PAGES ── */
 .pages{flex:1;overflow:hidden;position:relative;min-height:0}
@@ -67,7 +84,7 @@ html,body{height:100%;background:var(--bg);color:var(--body);font-family:-apple-
 /* ── BOTTOM NAV ── */
 .nav{flex-shrink:0;display:flex;background:var(--bg2);border-top:1px solid var(--line);padding:6px 0 max(6px,env(safe-area-inset-bottom));box-shadow:0 -1px 6px rgba(0,0,0,.06)}
 .nb{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 0;border:none;background:none;color:var(--muted);cursor:pointer;transition:color .15s}
-.nb.on{color:var(--mint)}
+.nb.on{color:var(--prot)}
 .nb-ico{font-size:20px;line-height:1}
 .nb-lbl{font-size:9px;font-weight:700;letter-spacing:.4px;text-transform:uppercase}
 
@@ -79,15 +96,15 @@ html,body{height:100%;background:var(--bg);color:var(--body);font-family:-apple-
 .section-lbl::after{content:'';flex:1;height:1px;background:var(--line)}
 
 /* ── MOTIV CARD ── */
-.motiv{display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#ECFDF5,#EFF6FF);border:1px solid #6EE7B7;border-radius:var(--r);padding:12px 14px;margin-bottom:12px}
+.motiv{display:flex;align-items:center;gap:12px;background:#F8FFFE;border:1px solid #CCEBE8;border-radius:var(--r);padding:12px 14px;margin-bottom:12px}
 .motiv-ico{font-size:26px;flex-shrink:0}
 .motiv-txt{font-size:13px;font-weight:700;color:var(--bright);line-height:1.3}
 .motiv-sub{font-size:11px;color:var(--sub);margin-top:2px}
 
 /* ── WATER ── */
-.water{background:var(--card);border:1px solid #93C5FD;border-radius:var(--r);padding:12px 14px;margin-bottom:12px}
+.water{background:var(--card);border:1px solid #BAD0E8;border-radius:var(--r);padding:12px 14px;margin-bottom:12px}
 .water-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-.water-lbl{font-size:12px;font-weight:700;color:#1D4ED8}
+.water-lbl{font-size:12px;font-weight:700;color:var(--fat)}
 .water-val{font-size:12px;color:var(--muted)}
 .water-cups{display:flex;gap:5px;flex-wrap:wrap}
 .wcup{font-size:18px;cursor:pointer;opacity:.2;transition:opacity .15s;line-height:1}
@@ -104,27 +121,27 @@ html,body{height:100%;background:var(--bg);color:var(--body);font-family:-apple-
 .mhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
 .mpill{display:inline-flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--line);border-radius:20px;padding:5px 12px;font-size:13px;font-weight:600;color:var(--sub)}
 .mpill .dot{width:6px;height:6px;border-radius:50%;background:var(--line2);transition:all .2s}
-.mpill.has .dot{background:var(--mint);box-shadow:0 0 5px var(--mint)}
+.mpill.has .dot{background:var(--prot);box-shadow:0 0 5px rgba(15,118,110,.4)}
 .mtime{font-size:11px;color:var(--muted)}
 .mcard{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
 .chips{display:flex;gap:4px;flex-wrap:wrap;padding:8px 12px;border-bottom:1px solid var(--line)}
 .chip{font-size:10px;font-weight:700;padding:3px 7px;border-radius:20px;border:1.5px solid var(--line2);color:var(--muted)}
-.chip.done{border-color:var(--mint);color:var(--mint)}
-.chip.part{border-color:var(--amber);color:var(--amber)}
+.chip.done{border-color:var(--prot);color:var(--prot)}
+.chip.part{border-color:var(--warn);color:var(--warn)}
 .erow{display:flex;align-items:center;padding:10px 12px;border-bottom:1px solid var(--line);gap:8px}
 .erow:last-child{border-bottom:none}
 .ename{flex:1;font-size:13px;color:var(--bright);line-height:1.3}
 .ecat{font-size:10px;color:var(--muted);margin-top:1px}
 .etags{display:flex;gap:3px;flex-shrink:0}
 .tag{font-size:10px;font-weight:700;padding:2px 6px;border-radius:5px}
-.tp{background:rgba(95,224,160,.12);color:var(--mint)}
-.tk{background:rgba(184,127,255,.12);color:var(--lilac)}
-.tc{background:rgba(255,184,77,.12);color:var(--amber)}
+.tp{background:rgba(15,118,110,.1);color:var(--prot)}
+.tk{background:rgba(194,65,12,.1);color:var(--kcal)}
+.tc{background:rgba(109,40,217,.1);color:var(--carb)}
 .xbtn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;padding:2px 5px;line-height:1}
 .emeal{padding:12px;font-size:12px;color:var(--muted);font-style:italic}
 .mtots{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
 .tchip{font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;background:var(--bg3);border:1px solid var(--line);color:var(--sub)}
-.abtn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;background:#ECFDF5;border:1.5px dashed #059669;border-radius:var(--r);padding:10px;color:#065F46;font-size:13px;font-weight:700;cursor:pointer;margin-top:6px;font-family:inherit}
+.abtn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;background:#F0FDFC;border:1.5px dashed #5EADA8;border-radius:var(--r);padding:10px;color:var(--prot);font-size:13px;font-weight:700;cursor:pointer;margin-top:6px;font-family:inherit}
 .drink-tip{margin-top:6px;padding:8px 12px;background:rgba(91,200,255,.07);border:1px solid rgba(91,200,255,.18);border-radius:8px;font-size:12px;color:var(--sky)}
 
 /* ── SUPPLEMENTS ── */
@@ -132,11 +149,11 @@ html,body{height:100%;background:var(--bg);color:var(--body);font-family:-apple-
 .sup-row:last-child{border-bottom:none}
 .sup-row.done{background:rgba(95,224,160,.03)}
 .sup-check{width:24px;height:24px;border-radius:50%;border:2px solid var(--line2);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;color:transparent;transition:all .2s}
-.sup-row.done .sup-check{background:var(--mint);border-color:var(--mint);color:var(--bg)}
+.sup-row.done .sup-check{background:var(--prot);border-color:var(--prot);color:#fff}
 .sup-name{font-size:14px;font-weight:600;color:var(--bright)}
-.sup-row.done .sup-name{color:var(--mint)}
+.sup-row.done .sup-name{color:var(--prot)}
 .sup-meta{font-size:11px;color:var(--muted);margin-top:1px}
-.sup-dose{font-size:11px;color:var(--amber);font-weight:600}
+.sup-dose{font-size:11px;color:var(--warn);font-weight:600}
 
 /* ── MODAL ── */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px)}
@@ -147,9 +164,9 @@ html,body{height:100%;background:var(--bg);color:var(--body);font-family:-apple-
 .cbtn{background:var(--raise);border:1px solid var(--line);color:var(--sub);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center}
 .search-row{display:flex;gap:8px;margin-bottom:10px}
 .sinput{flex:1;background:var(--bg3);border:1px solid var(--line2);border-radius:10px;padding:10px 12px;color:var(--bright);font-size:14px;font-family:inherit;outline:none}
-.sinput:focus{border-color:var(--mint)}
+.sinput:focus{border-color:var(--prot)}
 .sinput::placeholder{color:var(--muted)}
-.sbtn{background:var(--mint);border:none;border-radius:10px;padding:10px 14px;color:var(--bg);font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
+.sbtn{background:var(--prot);border:none;border-radius:10px;padding:10px 14px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
 .results{max-height:200px;overflow-y:auto;margin-bottom:12px}
 .ritem{padding:9px 12px;background:var(--bg3);border-radius:8px;margin-bottom:4px;cursor:pointer;border:1px solid transparent}
 .ritem:active{border-color:var(--mint);background:var(--bg3)}
@@ -160,9 +177,9 @@ html,body{height:100%;background:var(--bg);color:var(--body);font-family:-apple-
 .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--line)}
 .flbl{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--sub);margin-bottom:4px;display:block}
 .finput{width:100%;background:var(--bg3);border:1px solid var(--line2);border-radius:10px;padding:10px 12px;color:var(--bright);font-size:14px;font-family:inherit;outline:none;margin-bottom:8px}
-.finput:focus{border-color:var(--mint)}
+.finput:focus{border-color:var(--prot)}
 .f3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
-.save-btn{width:100%;background:var(--amber);border:none;border-radius:12px;padding:13px;color:var(--bg);font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;margin-top:4px}
+.save-btn{width:100%;background:var(--prot);border:none;border-radius:12px;padding:13px;color:var(--bg);font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;margin-top:4px}
 
 /* ── SUMMARY ── */
 .nav-dates{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
@@ -170,13 +187,13 @@ html,body{height:100%;background:var(--bg);color:var(--body);font-family:-apple-
 .date-lbl{font-size:16px;font-weight:800;color:var(--bright)}
 .score-ring{display:flex;flex-direction:column;align-items:center;margin-bottom:16px}
 .ring{width:110px;height:110px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;border:3px solid var(--line);margin-bottom:8px}
-.ring.great{border-color:var(--mint);background:#F0FDF4}
-.ring.ok{border-color:var(--amber);background:#FFFBEB}
-.ring.poor{border-color:var(--coral);background:#FEF2F2}
+.ring.great{border-color:var(--prot);background:#F0FDFC}
+.ring.ok{border-color:var(--amber);background:#FAF5EC}
+.ring.poor{border-color:var(--coral);background:#FAF0F0}
 .score-num{font-size:38px;font-weight:900;line-height:1}
-.score-num.great{color:var(--mint)}
-.score-num.ok{color:var(--amber)}
-.score-num.poor{color:var(--coral)}
+.score-num.great{color:var(--prot)}
+.score-num.ok{color:var(--warn)}
+.score-num.poor{color:var(--danger)}
 .score-den{font-size:11px;color:var(--muted)}
 .score-msg{font-size:13px;color:var(--sub);text-align:center}
 .mbar-row{display:flex;align-items:center;gap:10px;margin-bottom:11px}
@@ -186,17 +203,17 @@ html,body{height:100%;background:var(--bg);color:var(--body);font-family:-apple-
 .mbar-fill{height:100%;border-radius:4px;transition:width .5s}
 .mbar-val{font-size:12px;font-weight:700;width:60px;text-align:right;flex-shrink:0}
 .fbcard{border-radius:var(--rs);padding:11px 14px;margin-bottom:8px}
-.fbcard.great{background:#F0FDF4;border:1px solid #34D399}
-.fbcard.warn{background:#FFFBEB;border:1px solid #F59E0B}
-.fbcard.bad{background:#FEF2F2;border:1px solid #F87171}
+.fbcard.great{background:#F0FDFC;border:1px solid #99D4D0}
+.fbcard.warn{background:#FFFBEB;border:1px solid #F0C060}
+.fbcard.bad{background:#FFF5F5;border:1px solid #E08080}
 .fbt{font-size:13px;font-weight:700;margin-bottom:3px}
-.fbt.great{color:var(--mint)}.fbt.warn{color:var(--amber)}.fbt.bad{color:var(--coral)}
+.fbt.great{color:var(--prot)}.fbt.warn{color:var(--warn)}.fbt.bad{color:var(--danger)}
 .fbm{font-size:12px;color:var(--sub);line-height:1.5}
 
 /* ── HISTORY ── */
 .filters{display:flex;gap:6px;margin-bottom:14px}
 .fil{padding:6px 14px;border-radius:20px;border:1px solid var(--line);background:var(--bg3);color:var(--sub);font-size:12px;font-weight:700;cursor:pointer}
-.fil.on{background:var(--mint);border-color:var(--mint);color:var(--bg)}
+.fil.on{background:var(--prot);border-color:var(--prot);color:#fff}
 .chart-wrap{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:12px}
 .chart-lbl{font-size:9px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
 .bar-chart{display:flex;align-items:flex-end;gap:3px;height:56px}
@@ -222,18 +239,18 @@ html,body{height:100%;background:var(--bg);color:var(--body);font-family:-apple-
 .hd-meal-prot{font-weight:700;flex-shrink:0;font-size:10px}
 .hd-sups{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px;padding-top:6px;border-top:1px solid var(--line)}
 .hd-sup{font-size:10px;padding:2px 7px;border-radius:20px;font-weight:600}
-.hd-sup.ok{background:rgba(14,168,116,.1);color:var(--mint)}
+.hd-sup.ok{background:#F0FDFC;color:var(--prot)}
 .hd-sup.miss{background:var(--bg3);color:var(--muted);opacity:.6}
 
 /* ── ACHIEVEMENTS ── */
 .ach-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .ach{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:12px;text-align:center;position:relative;overflow:hidden}
-.ach.done{border-color:var(--gold)}
+.ach.done{border-color:#D97706;box-shadow:0 0 0 1px #D97706}
 .ach.locked{opacity:.35;filter:grayscale(.7)}
 .ach-ico{font-size:28px;margin-bottom:5px}
 .ach-name{font-size:11px;font-weight:800;color:var(--bright);margin-bottom:2px}
 .ach-desc{font-size:10px;color:var(--sub);line-height:1.4}
-.ach-xp{position:absolute;top:6px;right:7px;font-size:10px;font-weight:700;color:var(--gold)}
+.ach-xp{position:absolute;top:6px;right:7px;font-size:10px;font-weight:700;color:#92400E}
 
 /* ── REPORT ── */
 .rep-top{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin-bottom:12px}
@@ -252,7 +269,7 @@ html,body{height:100%;background:var(--bg);color:var(--body);font-family:-apple-
 .rsr{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid var(--line);font-size:13px;color:var(--sub)}
 .rsr:last-child{border-bottom:none}
 .rsv{font-weight:700;color:var(--bright)}
-.rep-btn{width:100%;background:var(--mint);border:none;border-radius:12px;padding:13px;color:var(--bg);font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;margin-bottom:8px}
+.rep-btn{width:100%;background:var(--prot);border:none;border-radius:12px;padding:13px;color:var(--bg);font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;margin-bottom:8px}
 .rep-btn2{width:100%;background:var(--raise);border:1px solid var(--line);border-radius:12px;padding:12px;color:var(--sub);font-size:13px;cursor:pointer;font-family:inherit}
 
 /* ── EMPTY ── */
@@ -262,17 +279,17 @@ html,body{height:100%;background:var(--bg);color:var(--body);font-family:-apple-
 
 /* ── XP POP ── */
 @keyframes xpPop{0%{transform:translateY(0) scale(1);opacity:1}100%{transform:translateY(-50px) scale(1.4);opacity:0}}
-.xp-pop{position:fixed;pointer-events:none;font-size:20px;font-weight:900;color:var(--mint);z-index:500;animation:xpPop .8s ease-out forwards}
+.xp-pop{position:fixed;pointer-events:none;font-size:20px;font-weight:900;color:var(--prot);z-index:500;animation:xpPop .8s ease-out forwards}
 
 /* ── CELEBRATE ── */
 #confetti-canvas{position:fixed;inset:0;pointer-events:none;z-index:998;display:none}
 .toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);background:var(--bg2);border:2px solid var(--gold);box-shadow:0 20px 60px rgba(0,0,0,.15);border-radius:20px;padding:24px 28px;text-align:center;z-index:999;transition:transform .3s cubic-bezier(.34,1.56,.64,1);max-width:300px;width:90%}
 .toast.on{transform:translate(-50%,-50%) scale(1)}
 .toast-ico{font-size:48px;margin-bottom:8px}
-.toast-title{font-size:20px;font-weight:900;color:var(--gold);margin-bottom:6px}
+.toast-title{font-size:20px;font-weight:900;color:#92400E;margin-bottom:6px}
 .toast-msg{font-size:13px;color:var(--sub);line-height:1.5;margin-bottom:12px;white-space:pre-line}
-.toast-xp{font-size:16px;font-weight:800;color:var(--mint);margin-bottom:14px}
-.toast-close{background:var(--mint);border:none;border-radius:10px;padding:9px 22px;color:var(--bg);font-size:13px;font-weight:800;cursor:pointer;font-family:inherit}
+.toast-xp{font-size:16px;font-weight:800;color:var(--prot);margin-bottom:14px}
+.toast-close{background:var(--prot);border:none;border-radius:10px;padding:9px 22px;color:var(--bg);font-size:13px;font-weight:800;cursor:pointer;font-family:inherit}
 
 @media print{.nav,.rep-btn,.rep-btn2{display:none!important}.page{display:block!important;overflow:visible!important;position:static!important}.pages,.app{overflow:visible!important;height:auto!important}}
 </style>
@@ -339,6 +356,7 @@ html,body{height:100%;background:var(--bg);color:var(--body);font-family:-apple-
     <!-- HOY -->
     <div class="page on" id="pageHoy">
       <div id="motivDiv"></div>
+      <div id="progressDiv"></div>
       <div id="waterDiv"></div>
       <div id="heatmapDiv"></div>
       <div id="mealsDiv"></div>
@@ -453,13 +471,35 @@ async function sbGet(path) {
 }
 
 async function sbUpsert(table, body) {
+  // Columnas de conflicto por tabla (para que PostgREST sepa qué constraint usar)
+  const conflictCols = {
+    'nl_days':  'user_key,date',
+    'nl_sups':  'user_key,date',
+    'nl_water': 'user_key,date',
+    'nl_game':  'user_key',
+  };
+  const onConflict = conflictCols[table] || 'user_key,date';
   try {
-    await fetch(SB+'/rest/v1/'+table, {
+    const r = await fetch(`${SB}/rest/v1/${table}?on_conflict=${onConflict}`, {
       method:'POST',
-      headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates,return=minimal'},
+      headers:{
+        'apikey':KEY,
+        'Authorization':'Bearer '+KEY,
+        'Content-Type':'application/json',
+        'Prefer':'resolution=merge-duplicates,return=minimal'
+      },
       body:JSON.stringify(body)
     });
-  } catch(e) {}
+    if(!r.ok) {
+      const err = await r.text().catch(()=>'');
+      console.warn('sbUpsert error',table,r.status,err);
+      return false;
+    }
+    return true;
+  } catch(e) {
+    console.warn('sbUpsert catch',table,e.message);
+    return false;
+  }
 }
 
 async function loadFromSupabase() {
@@ -488,17 +528,17 @@ async function loadFromSupabase() {
 
 async function saveDay(date) {
   const d = DB.day(date);
-  sbUpsert('nl_days',{user_key:USER,date,meals:d.meals});
+  return await sbUpsert('nl_days',{user_key:USER,date,meals:d.meals});
 }
 async function saveSups(date) {
-  sbUpsert('nl_sups',{user_key:USER,date,data:DB.sups(date)});
+  return await sbUpsert('nl_sups',{user_key:USER,date,data:DB.sups(date)});
 }
 async function saveWater(date) {
-  sbUpsert('nl_water',{user_key:USER,date,glasses:DB.water(date)});
+  return await sbUpsert('nl_water',{user_key:USER,date,glasses:DB.water(date)});
 }
 async function saveGame() {
   const g=DB.game();
-  sbUpsert('nl_game',{user_key:USER,xp:g.xp,unlocked_achs:g.achs,last_date:g.lastDate});
+  return await sbUpsert('nl_game',{user_key:USER,xp:g.xp,unlocked_achs:g.achs,last_date:g.lastDate});
 }
 
 // ═══════════════════════════════════════════════
@@ -755,6 +795,8 @@ const FOODS=[
 {n:'2 huevos cacerola con aceite oliva',cat:'🍗 Carnes',g:'proteina',p:12,c:1,f:15,k:184,u:'2 huevos + 1 cdita aceite oliva'},
 {n:'Huevo revuelto (2 und)',cat:'🍗 Carnes',g:'proteina',p:12,c:1,f:12,k:156,u:'2 huevos con 1 cdita aceite'},
 {n:'Carne molida magra',cat:'🍗 Carnes',g:'proteina',p:18,c:0,f:10,k:162,u:'100g cocida'},
+{n:'Huevo en cacerola (1 und)',cat:'🍗 Carnes',g:'proteina',p:6,c:0,f:5,k:73,u:'50g · 1 und · con aceite'},
+{n:'Huevo en cacerola (2 und)',cat:'🍗 Carnes',g:'proteina',p:12,c:1,f:10,k:150,u:'100g · 2 und · con aceite'},
 {n:'Chorizo parrilla',cat:'🍖 Embutidos',g:'proteina',p:8,c:1,f:16,k:181,u:'50g · 1 und mediano'},
 {n:'Albóndigas de res (5 und pequeñas)',cat:'🍱 Preparaciones',g:'proteina',p:18,c:4,f:10,k:178,u:'~120g · 5 und pequeñas'},
 {n:'Arepa de yuca con queso y mantequilla',cat:'🍱 Preparaciones',g:'mixto',p:5,c:22,f:8,k:177,u:'1 arepa + 30g queso + 1 cdita mantequilla'},
@@ -811,12 +853,47 @@ function updateGame() {
 // ═══════════════════════════════════════════════
 function renderHoy() {
   renderMotiv();
+  renderProgress();
   renderWater();
   renderHeatmap();
   renderMeals();
   renderSups();
   updateHdr(totals(TODAY()));
   updateGame();
+}
+
+function renderProgress() {
+  const t=totals(TODAY());
+  const pPct=Math.min(100,Math.round(t.p/GOALS.p*100));
+  const kPct=Math.min(100,Math.round(t.k/GOALS.k*100));
+  const cPct=Math.min(100,Math.round(t.c/GOALS.c*100));
+  const fPct=Math.min(100,Math.round(t.f/GOALS.f*100));
+  const score=Math.round(pPct*.45+kPct*.30+cPct*.15+fPct*.10);
+  const scoreCol=score>=75?'var(--mint)':score>=50?'var(--amber)':'var(--coral)';
+  function bar(pct,col,val,goal,unit){
+    const over=pct>=100;
+    return `<div style="margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px">
+        <span style="font-weight:700;color:${col}">${val}${unit}</span>
+        <span style="color:var(--muted)">meta ${goal}${unit} · <strong style="color:${over?'var(--mint)':'var(--body)'}">${pct}%</strong></span>
+      </div>
+      <div style="height:6px;background:var(--line);border-radius:3px;overflow:hidden">
+        <div style="height:100%;width:${pct}%;background:${col};border-radius:3px;transition:width .4s"></div>
+      </div>
+    </div>`;
+  }
+  const el=document.getElementById('progressDiv');
+  if(!el) return;
+  el.innerHTML=`<div class="card" style="padding:14px;margin-bottom:12px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <span style="font-size:12px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--sub)">Progreso de hoy</span>
+      <span style="font-size:20px;font-weight:900;color:${scoreCol}">${score}<span style="font-size:11px;font-weight:600;color:var(--muted)">/100</span></span>
+    </div>
+    ${bar(pPct,'var(--prot)',Math.round(t.p),'90','g')}
+    ${bar(kPct,'var(--kcal)',Math.round(t.k),'1650','')}
+    ${bar(cPct,'var(--carb)',Math.round(t.c),'145','g')}
+    ${bar(fPct,'var(--fat)',Math.round(t.f),'58','g')}
+  </div>`;
 }
 
 function renderMotiv() {
@@ -1013,25 +1090,40 @@ function pickFood(f) {
 function saveManual() {
   const name=document.getElementById('mName').value.trim();
   if(!name){alert('Escribe el nombre');return}
-  const p=parseFloat(document.getElementById('mP').value)||0;
-  const c=parseFloat(document.getElementById('mC').value)||0;
-  const f=parseFloat(document.getElementById('mF').value)||0;
-  let k=parseFloat(document.getElementById('mK').value)||0;
+  const p=Math.max(0,parseFloat(document.getElementById('mP').value)||0);
+  const c=Math.max(0,parseFloat(document.getElementById('mC').value)||0);
+  const f=Math.max(0,parseFloat(document.getElementById('mF').value)||0);
+  let k=Math.max(0,parseFloat(document.getElementById('mK').value)||0);
   if(!k) k=Math.round(p*4+c*4+f*9);
+  if(p===0&&c===0&&f===0&&k===0){
+    if(!confirm('¿Registrar sin valores nutricionales?')) return;
+  }
   addEntry({n:name,p,k,c,f,u:'manual',g:'mixto'});
 }
 
 async function addEntry(entry) {
   if(!curMeal) return;
+  // Validar y limpiar macros — nunca guardar null o NaN
+  const clean = {
+    n: entry.n || 'Alimento',
+    p: Math.max(0, parseFloat(entry.p) || 0),
+    k: Math.max(0, parseFloat(entry.k) || 0),
+    c: Math.max(0, parseFloat(entry.c) || 0),
+    f: Math.max(0, parseFloat(entry.f) || 0),
+    u: entry.u || '',
+    g: entry.g || 'mixto'
+  };
+  // Si no hay kcal, calcular por fórmula
+  if(!clean.k) clean.k = Math.round(clean.p*4 + clean.c*4 + clean.f*9);
   const data=DB.day(TODAY());
   if(!data.meals[curMeal]) data.meals[curMeal]=[];
-  data.meals[curMeal].push(entry);
+  data.meals[curMeal].push(clean);
   DB.set('day_'+TODAY(),data);
   await saveDay(TODAY());
   closeModal();
   const xp=entry.g==='proteina'?12:entry.g==='verdura'?10:entry.g==='fruta'?8:5;
   addXP(xp); checkAchs();
-  renderMeals(); updateHdr(totals(TODAY())); renderHeatmap();
+  renderMeals(); updateHdr(totals(TODAY())); renderHeatmap(); renderProgress();
 }
 
 async function delEntry(mid, idx) {
@@ -1039,7 +1131,7 @@ async function delEntry(mid, idx) {
   data.meals[mid].splice(idx,1);
   DB.set('day_'+TODAY(),data);
   await saveDay(TODAY());
-  renderMeals(); updateHdr(totals(TODAY())); renderHeatmap();
+  renderMeals(); updateHdr(totals(TODAY())); renderHeatmap(); renderProgress();
 }
 
 // ═══════════════════════════════════════════════
@@ -1066,10 +1158,10 @@ function renderSum(date) {
   const cls=sc>=75?'great':sc>=50?'ok':'poor';
   const msg=sc>=75?'✨ ¡Excelente! Plan bien cumplido.':sc>=50?'👍 Buen día, hay áreas de mejora.':'⚠️ Día difícil — mañana es otra oportunidad.';
   const macros=[
-    {l:'Proteína',v:t.p,g:GOALS.p,u:'g',col:'var(--mint)'},
-    {l:'Calorías',v:t.k,g:GOALS.k,u:'kcal',col:'var(--lilac)'},
-    {l:'Carbohid.',v:t.c,g:GOALS.c,u:'g',col:'var(--amber)'},
-    {l:'Grasas',v:t.f,g:GOALS.f,u:'g',col:'var(--sky)'},
+    {l:'Proteína',v:t.p,g:GOALS.p,u:'g',col:'var(--prot)'},
+    {l:'Calorías',v:t.k,g:GOALS.k,u:'kcal',col:'var(--kcal)'},
+    {l:'Carbohid.',v:t.c,g:GOALS.c,u:'g',col:'var(--carb)'},
+    {l:'Grasas',v:t.f,g:GOALS.f,u:'g',col:'var(--fat)'},
   ];
   const fbs=[];
   if(t.p>=GOALS.p*.9) fbs.push({c:'great',t:'✅ Meta de proteína alcanzada',m:`${Math.round(t.p)}g de ${GOALS.p}g — ¡clave para combatir la sarcopenia!`});
@@ -1166,15 +1258,15 @@ function renderHist() {
         <div class="hdinfo">
           <div class="hddate">${dn[dt.getDay()]} ${dt.getDate()} de ${mn[dt.getMonth()]}</div>
           <div class="hdmacros">
-            <span class="hdmacro" style="color:var(--mint)">💪 ${Math.round(t.p)}g prot</span>
-            <span class="hdmacro" style="color:var(--lilac)">🔥 ${Math.round(t.k)} kcal</span>
-            <span class="hdmacro" style="color:var(--amber)">🌾 ${Math.round(t.c)}g carb</span>
-            <span class="hdmacro" style="color:var(--sky)">🥑 ${Math.round(t.f)}g gras</span>
+            <span class="hdmacro" style="color:var(--prot)">💪 ${Math.round(t.p)}g prot</span>
+            <span class="hdmacro" style="color:var(--kcal)">🔥 ${Math.round(t.k)} kcal</span>
+            <span class="hdmacro" style="color:var(--carb)">🌾 ${Math.round(t.c)}g carb</span>
+            <span class="hdmacro" style="color:var(--fat)">🥑 ${Math.round(t.f)}g gras</span>
           </div>
           <div class="hdbars">
-            <div class="hb" title="Proteína"><div class="hbf" style="width:${Math.min(100,t.p/GOALS.p*100).toFixed(0)}%;background:var(--mint)"></div></div>
-            <div class="hb" title="Calorías"><div class="hbf" style="width:${Math.min(100,t.k/GOALS.k*100).toFixed(0)}%;background:var(--lilac)"></div></div>
-            <div class="hb" title="Carbos"><div class="hbf" style="width:${Math.min(100,t.c/GOALS.c*100).toFixed(0)}%;background:var(--amber)"></div></div>
+            <div class="hb" title="Proteína"><div class="hbf" style="width:${Math.min(100,t.p/GOALS.p*100).toFixed(0)}%;background:var(--prot)"></div></div>
+            <div class="hb" title="Calorías"><div class="hbf" style="width:${Math.min(100,t.k/GOALS.k*100).toFixed(0)}%;background:var(--kcal)"></div></div>
+            <div class="hb" title="Carbos"><div class="hbf" style="width:${Math.min(100,t.c/GOALS.c*100).toFixed(0)}%;background:var(--carb)"></div></div>
           </div>
         </div>
       </div>
@@ -1237,17 +1329,36 @@ function renderRep() {
   const dates=DB.allDates();
   const has=dates.some(d=>Object.values(DB.day(d).meals).some(e=>e.length>0));
   if(!has){document.getElementById('repDiv').innerHTML='<div class="empty"><div class="empty-ico">📋</div><div class="empty-txt">El informe aparece aquí una vez que registres tus primeras comidas.</div></div>';return}
-  let dl=0,tp=0,tk=0,mp=0; const add=[];
-  dates.forEach(date=>{
+  let dl=0,tp=0,tk=0,tc=0,tf=0,mp=0; const rows=[];
+  const allDays = [...dates].reverse(); // cronológico
+  allDays.forEach(date=>{
     const t=totals(date); const d=DB.day(date); const s=DB.sups(date);
     const has2=Object.values(d.meals).some(e=>e.length>0)||s.prowhey;
-    if(has2){dl++;tp+=t.p;tk+=t.k;if(t.p>=GOALS.p*.85)mp++;add.push({date,p:t.p,k:t.k})}
+    if(has2){dl++;tp+=t.p;tk+=t.k;tc+=t.c;tf+=t.f;if(t.p>=GOALS.p*.85)mp++;rows.push({date,p:t.p,k:t.k,c:t.c,f:t.f,s})}
   });
-  const avgP=dl?Math.round(tp/dl):0, avgK=dl?Math.round(tk/dl):0, pcP=dl?Math.round(mp/dl*100):0;
-  const s=streak(); const g=DB.game(); const lv=getLevel(g.xp);
+  const avgP=dl?Math.round(tp/dl):0,avgK=dl?Math.round(tk/dl):0,avgC=dl?Math.round(tc/dl):0,avgF=dl?Math.round(tf/dl):0;
+  const pcP=dl?Math.round(mp/dl*100):0;
+  const str=streak(); const g=DB.game(); const lv=getLevel(g.xp);
   const MN=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
-  const fd=new Date(dates[dates.length-1]+'T12:00:00'), ld=new Date(dates[0]+'T12:00:00');
-  const DN2=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  const DN=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  const fd=new Date(rows[0].date+'T12:00:00'),ld=new Date(rows[rows.length-1].date+'T12:00:00');
+
+  // Tabla completa por día
+  const tableRows = rows.map(r=>{
+    const dt=new Date(r.date+'T12:00:00');
+    const okP=r.p>=GOALS.p*.85;
+    const okK=r.k>=GOALS.k*.75&&r.k<=GOALS.k*1.15;
+    const pw=r.s&&r.s.prowhey?'✓':'—';
+    return `<tr>
+      <td style="font-weight:700;white-space:nowrap">${DN[dt.getDay()]} ${dt.getDate()} ${MN[dt.getMonth()]}</td>
+      <td style="color:${okP?'#1A7A57':'#C0392B'};font-weight:700;text-align:right">${Math.round(r.p)}g</td>
+      <td style="text-align:right">${Math.round(r.k)}</td>
+      <td style="text-align:right">${Math.round(r.c)}g</td>
+      <td style="text-align:right">${Math.round(r.f)}g</td>
+      <td style="text-align:center;color:${okP?'#059669':'#9CA3AF'}">${pw}</td>
+    </tr>`;
+  }).join('');
+
   document.getElementById('repDiv').innerHTML=`
     <div class="rep-top">
       <div class="rep-name">Informe Nutricional</div>
@@ -1255,32 +1366,60 @@ function renderRep() {
       <div class="rep-grid">
         <div class="rep-cell"><div class="rep-cl">Período</div><div class="rep-cv" style="font-size:12px">${fd.getDate()} ${MN[fd.getMonth()]} – ${ld.getDate()} ${MN[ld.getMonth()]}</div></div>
         <div class="rep-cell"><div class="rep-cl">Días registrados</div><div class="rep-cv">${dl}</div></div>
-        <div class="rep-cell"><div class="rep-cl">Adherencia prot.</div><div class="rep-cv" style="color:${pcP>=75?'var(--mint)':'var(--amber)'}">${pcP}%</div></div>
-        <div class="rep-cell"><div class="rep-cl">Racha actual</div><div class="rep-cv" style="color:var(--amber)">${s} días 🔥</div></div>
+        <div class="rep-cell"><div class="rep-cl">Adherencia prot.</div><div class="rep-cv" style="color:${pcP>=75?'var(--prot)':'var(--warn)'}">${pcP}%</div></div>
+        <div class="rep-cell"><div class="rep-cl">Racha actual</div><div class="rep-cv" style="color:var(--amber)">${str} días 🔥</div></div>
       </div>
     </div>
     <div class="stats-row">
-      <div class="stat"><div class="stat-v" style="color:var(--mint)">${avgP}g</div><div class="stat-l">Prot. prom.</div></div>
-      <div class="stat"><div class="stat-v" style="color:var(--lilac)">${avgK}</div><div class="stat-l">kcal prom.</div></div>
-      <div class="stat"><div class="stat-v" style="color:${pcP>=75?'var(--mint)':'var(--amber)'}">${pcP}%</div><div class="stat-l">Meta prot.</div></div>
+      <div class="stat"><div class="stat-v" style="color:var(--prot)">${avgP}g</div><div class="stat-l">Prot. prom.<br><small style="color:var(--muted)">meta 90g</small></div></div>
+      <div class="stat"><div class="stat-v" style="color:var(--kcal)">${avgK}</div><div class="stat-l">kcal prom.<br><small style="color:var(--muted)">meta 1650</small></div></div>
+      <div class="stat"><div class="stat-v" style="color:var(--carb)">${avgC}g</div><div class="stat-l">Carb. prom.<br><small style="color:var(--muted)">meta 145g</small></div></div>
     </div>
-    <div class="rsec">
-      <div class="rsh">Promedios vs metas</div>
-      ${[{n:'Proteína (meta 90g)',v:avgP+'g',ok:avgP>=GOALS.p*.85},{n:'Calorías (meta 1.650)',v:avgK+' kcal',ok:avgK>=GOALS.k*.85&&avgK<=GOALS.k*1.1},{n:'Adherencia proteína',v:pcP+'%',ok:pcP>=75}].map(r=>`
-        <div class="rsr"><span>${r.n}</span><span class="rsv" style="color:${r.ok?'var(--mint)':'var(--amber)'}">${r.v} ${r.ok?'✓':'⚠️'}</span></div>`).join('')}
+
+    <!-- TABLA COMPLETA -->
+    <div class="rsec" style="overflow-x:auto">
+      <div class="rsh">📋 Registro completo de todos los días</div>
+      <table style="width:100%;border-collapse:collapse;font-size:12px">
+        <thead>
+          <tr style="background:var(--raise)">
+            <th style="padding:8px 10px;text-align:left;font-size:10px;letter-spacing:.8px;color:var(--muted);text-transform:uppercase">Fecha</th>
+            <th style="padding:8px 6px;text-align:right;font-size:10px;letter-spacing:.8px;color:var(--muted);text-transform:uppercase">Prot.</th>
+            <th style="padding:8px 6px;text-align:right;font-size:10px;letter-spacing:.8px;color:var(--muted);text-transform:uppercase">kcal</th>
+            <th style="padding:8px 6px;text-align:right;font-size:10px;letter-spacing:.8px;color:var(--muted);text-transform:uppercase">Carb.</th>
+            <th style="padding:8px 6px;text-align:right;font-size:10px;letter-spacing:.8px;color:var(--muted);text-transform:uppercase">Gras.</th>
+            <th style="padding:8px 6px;text-align:center;font-size:10px;letter-spacing:.8px;color:var(--muted);text-transform:uppercase">PW</th>
+          </tr>
+        </thead>
+        <tbody style="color:var(--body)">
+          ${tableRows}
+          <tr style="background:var(--raise);font-weight:800;border-top:2px solid var(--line2)">
+            <td style="padding:8px 10px;font-size:11px;color:var(--sub)">PROMEDIO</td>
+            <td style="padding:8px 6px;text-align:right;color:${avgP>=GOALS.p*.85?'#059669':'#DC2626'}">${avgP}g</td>
+            <td style="padding:8px 6px;text-align:right">${avgK}</td>
+            <td style="padding:8px 6px;text-align:right">${avgC}g</td>
+            <td style="padding:8px 6px;text-align:right">${avgF}g</td>
+            <td style="padding:8px 6px;text-align:center">—</td>
+          </tr>
+          <tr style="background:#F0F7F4;font-size:10px;color:var(--muted)">
+            <td style="padding:6px 10px;font-style:italic">META</td>
+            <td style="padding:6px 6px;text-align:right;color:#059669;font-weight:700">90g</td>
+            <td style="padding:6px 6px;text-align:right;font-weight:700">1650</td>
+            <td style="padding:6px 6px;text-align:right;font-weight:700">145g</td>
+            <td style="padding:6px 6px;text-align:right;font-weight:700">58g</td>
+            <td style="padding:6px 6px"></td>
+          </tr>
+        </tbody>
+      </table>
     </div>
+
     <div class="rsec">
-      <div class="rsh">Progreso en NutriLog</div>
-      <div class="rsr"><span>Nivel actual</span><span class="rsv" style="color:var(--gold)">${lv.name}</span></div>
-      <div class="rsr"><span>XP total</span><span class="rsv" style="color:var(--lilac)">${g.xp} XP</span></div>
-      <div class="rsr"><span>Logros desbloqueados</span><span class="rsv" style="color:var(--amber)">${(g.achs||[]).length} / ${ACHIEVEMENTS.length}</span></div>
-    </div>
-    <div class="rsec">
-      <div class="rsh">Últimos ${Math.min(10,add.length)} días</div>
-      ${add.slice(0,10).map(d=>{const dt=new Date(d.date+'T12:00:00');return`<div class="rsr"><span>${DN2[dt.getDay()]} ${dt.getDate()}/${dt.getMonth()+1}</span><span style="font-size:11px;color:var(--sub)">💪${Math.round(d.p)}g · 🔥${Math.round(d.k)}kcal</span><span class="rsv" style="color:${d.p>=GOALS.p*.85?'var(--mint)':'var(--amber)'}">${d.p>=GOALS.p*.85?'✓':'⚠️'}</span></div>`}).join('')}
+      <div class="rsh">Progreso NutriLog</div>
+      <div class="rsr"><span>Nivel</span><span class="rsv" style="color:var(--gold)">${lv.name}</span></div>
+      <div class="rsr"><span>XP total</span><span class="rsv" style="color:var(--carb)">${g.xp} XP</span></div>
+      <div class="rsr"><span>Logros</span><span class="rsv" style="color:var(--warn)">${(g.achs||[]).length} / ${ACHIEVEMENTS.length}</span></div>
     </div>
     <button class="rep-btn" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
-    <button class="rep-btn2" onclick="copyRep()">📋 Copiar resumen para WhatsApp</button>
+    <button class="rep-btn2" onclick="copyRep()" style="margin-top:8px">📋 Copiar para WhatsApp</button>
     <div id="copyOk" style="display:none;text-align:center;color:var(--mint);font-size:12px;margin-top:8px">✓ Copiado</div>`;
 }
 
