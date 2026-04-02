@@ -168,11 +168,17 @@ html,body{height:100%;background:var(--bg);color:var(--body);font-family:-apple-
 .sinput::placeholder{color:var(--muted)}
 .sbtn{background:var(--prot);border:none;border-radius:10px;padding:10px 14px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
 .results{max-height:200px;overflow-y:auto;margin-bottom:12px}
-.ritem{padding:9px 12px;background:var(--bg3);border-radius:8px;margin-bottom:4px;cursor:pointer;border:1px solid transparent}
-.ritem:active{border-color:var(--mint);background:var(--bg3)}
-.rname{font-size:13px;font-weight:600;color:var(--bright)}
-.rmeta{font-size:10px;color:var(--sub);margin-top:2px}
-.rcat{font-size:9px;color:var(--muted);background:var(--line);padding:1px 5px;border-radius:3px}
+.ritem{padding:10px 12px;background:var(--bg3);border-radius:10px;margin-bottom:5px;cursor:pointer;border:1px solid var(--line)}
+.ritem:active{border-color:var(--prot);background:#F0FDFC}
+.rname{font-size:13px;font-weight:700;color:var(--bright);line-height:1.3}
+.rmeta{display:flex;gap:6px;flex-wrap:wrap;margin-top:5px;align-items:center}
+.rmeta-u{font-size:10px;color:var(--muted);flex:1;min-width:100%}
+.rmacro{font-size:11px;font-weight:800;padding:2px 7px;border-radius:6px;letter-spacing:.2px}
+.rmacro-p{background:rgba(15,118,110,.1);color:var(--prot)}
+.rmacro-k{background:rgba(194,65,12,.1);color:var(--kcal)}
+.rmacro-c{background:rgba(109,40,217,.1);color:var(--carb)}
+.rmacro-f{background:rgba(30,99,176,.1);color:var(--fat)}
+.rcat{font-size:9px;color:var(--muted);background:var(--line);padding:2px 6px;border-radius:4px;font-weight:600}
 .divider{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:10px;letter-spacing:1px;text-transform:uppercase;margin:10px 0}
 .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--line)}
 .flbl{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--sub);margin-bottom:4px;display:block}
@@ -647,291 +653,292 @@ const ACHIEVEMENTS = [
 //  BASE DE DATOS DE ALIMENTOS (488 items)
 // ═══════════════════════════════════════════════
 const FOODS=[
-{n:'Pechuga de pollo',cat:'🍗 Carnes',g:'proteina',p:25,c:0,f:3,k:131,u:'80g · ¼ pechuga'},
-{n:'Contramuslo de pollo',cat:'🍗 Carnes',g:'proteina',p:22,c:0,f:5,k:133,u:'86g · 1 und'},
-{n:'Muslo de pollo',cat:'🍗 Carnes',g:'proteina',p:20,c:0,f:6,k:130,u:'75g · 1 und'},
-{n:'Pollo desmechado',cat:'🍗 Carnes',g:'proteina',p:22,c:0,f:3,k:115,u:'80g cocido'},
-{n:'Pollo asado',cat:'🍗 Carnes',g:'proteina',p:24,c:0,f:4,k:132,u:'85g'},
-{n:'Pavo sin piel',cat:'🍗 Carnes',g:'proteina',p:24,c:0,f:3,k:123,u:'100g'},
-{n:'Carne de res magra',cat:'🍗 Carnes',g:'proteina',p:22,c:0,f:5,k:133,u:'100g · 1/5 libra'},
-{n:'Carne de cerdo lomo',cat:'🍗 Carnes',g:'proteina',p:22,c:0,f:4,k:124,u:'100g magro'},
-{n:'Atún en agua (lata)',cat:'🍗 Carnes',g:'proteina',p:28,c:0,f:1,k:121,u:'120g · 1 lata'},
-{n:'Salmón rosado',cat:'🍗 Carnes',g:'proteina',p:18,c:0,f:5,k:117,u:'73g'},
-{n:'Trucha arcoíris',cat:'🍗 Carnes',g:'proteina',p:19,c:0,f:4,k:112,u:'81g · ½ und'},
-{n:'Huevo de gallina',cat:'🍗 Carnes',g:'proteina',p:6,c:0,f:5,k:73,u:'50g · 1 und'},
-{n:'Huevo revuelto (2)',cat:'🍗 Carnes',g:'proteina',p:12,c:0,f:10,k:146,u:'2 huevos + aceite'},
-{n:'Pargo (pescado)',cat:'🍗 Carnes',g:'proteina',p:21,c:0,f:1,k:97,u:'100g'},
-{n:'Queso fresco / cuajada',cat:'🧀 Quesos',g:'sustituto',p:5,c:1,f:4,k:60,u:'30g · 1 tajada'},
-{n:'Queso Campesino',cat:'🧀 Quesos',g:'sustituto',p:5,c:1,f:4,k:60,u:'30g'},
-{n:'Quesito antioqueño',cat:'🧀 Quesos',g:'sustituto',p:4,c:1,f:4,k:56,u:'30g'},
-{n:'Queso mozzarella',cat:'🧀 Quesos',g:'sustituto',p:6,c:1,f:5,k:73,u:'34g · 2 lonchitas'},
-{n:'Queso Cheddar',cat:'🧀 Quesos',g:'sustituto',p:5,c:0,f:7,k:83,u:'20g · 1 lonchita'},
-{n:'Queso Parmesano rallado',cat:'🧀 Quesos',g:'sustituto',p:5,c:1,f:4,k:58,u:'14g · 2 cdas'},
-{n:'Jamón de pavo',cat:'🧀 Quesos',g:'sustituto',p:7,c:1,f:2,k:50,u:'46g · 2 tajadas'},
-{n:'Jamón de cerdo bajo grasa',cat:'🧀 Quesos',g:'sustituto',p:7,c:1,f:3,k:59,u:'42g · 2 tajadas'},
-{n:'Salchichón de pollo',cat:'🧀 Quesos',g:'sustituto',p:6,c:1,f:4,k:64,u:'40g'},
-{n:'Proteína de soya',cat:'🧀 Quesos',g:'sustituto',p:12,c:8,f:1,k:89,u:'60g hidratada'},
-{n:'Prowhey Bariatric (3 scoops)',cat:'💪 Suplementos',g:'proteina',p:35,c:8,f:2,k:194,u:'51g · dosis diaria'},
-{n:'Prowhey Bariatric (1 scoop)',cat:'💪 Suplementos',g:'proteina',p:12,c:3,f:1,k:65,u:'17g · 1 scoop'},
-{n:'Creatina monohidrato (3g)',cat:'💪 Suplementos',g:'suplemento',p:0,c:0,f:0,k:0,u:'3g en agua'},
-{n:'Arroz blanco cocido',cat:'🍚 Cereales',g:'cereal',p:2,c:14,f:0,k:64,u:'52g · 4 cdas'},
-{n:'Arroz integral cocido',cat:'🍚 Cereales',g:'cereal',p:3,c:17,f:1,k:85,u:'63g · 6 cdas'},
-{n:'Avena en hojuelas',cat:'🍚 Cereales',g:'cereal',p:3,c:12,f:2,k:68,u:'18g · 3 cdas'},
-{n:'Pan integral',cat:'🍚 Cereales',g:'cereal',p:3,c:16,f:1,k:85,u:'32g · 1 tajada'},
-{n:'Pan blanco',cat:'🍚 Cereales',g:'cereal',p:2,c:12,f:1,k:65,u:'22g · 1 tajada'},
-{n:'Pan casero',cat:'🍚 Cereales',g:'cereal',p:3,c:14,f:1,k:75,u:'1 unidad'},
-{n:'Pandequeso',cat:'🍚 Cereales',g:'cereal',p:3,c:11,f:4,k:90,u:'28g · 1 und'},
-{n:'Pandeyuca',cat:'🍚 Cereales',g:'cereal',p:1,c:12,f:1,k:61,u:'20g · 2 und'},
-{n:'Almojábana',cat:'🍚 Cereales',g:'cereal',p:3,c:11,f:3,k:83,u:'24g · 1 und'},
-{n:'Arepa de maíz blanco',cat:'🍚 Cereales',g:'cereal',p:2,c:15,f:1,k:77,u:'35g · 1 und'},
-{n:'Arepa de chócolo',cat:'🍚 Cereales',g:'cereal',p:3,c:16,f:2,k:92,u:'50g · 1 und'},
-{n:'Arepa de plátano',cat:'🍚 Cereales',g:'cereal',p:1,c:14,f:1,k:69,u:'1 arepita asada'},
-{n:'Galleta Saltinas',cat:'🍚 Cereales',g:'cereal',p:2,c:12,f:2,k:74,u:'16g · 2 tablas'},
-{n:'Pasta de trigo cocida',cat:'🍚 Cereales',g:'cereal',p:3,c:14,f:1,k:77,u:'50g · ½ pocillo'},
-{n:'Macarrones cocidos',cat:'🍚 Cereales',g:'cereal',p:3,c:13,f:1,k:73,u:'45g · ½ pocillo'},
-{n:'Mazamorra antioqueña',cat:'🍚 Cereales',g:'cereal',p:2,c:14,f:1,k:73,u:'80g · 4 cdas'},
-{n:'Maíz tierno / chócolo',cat:'🍚 Cereales',g:'cereal',p:3,c:15,f:1,k:81,u:'88g · 6 cdas'},
-{n:'Papa común',cat:'🥔 Tubérculos',g:'tuberculo',p:2,c:16,f:0,k:72,u:'70g · 1 und'},
-{n:'Papa criolla (3 und)',cat:'🥔 Tubérculos',g:'tuberculo',p:2,c:18,f:0,k:80,u:'84g'},
-{n:'Papa en puré',cat:'🥔 Tubérculos',g:'tuberculo',p:2,c:16,f:1,k:80,u:'70g cocida'},
-{n:'Plátano verde',cat:'🥔 Tubérculos',g:'tuberculo',p:1,c:15,f:0,k:64,u:'52g · ¼ und'},
-{n:'Plátano hartón maduro',cat:'🥔 Tubérculos',g:'tuberculo',p:1,c:14,f:0,k:60,u:'51g'},
-{n:'Yuca blanca',cat:'🥔 Tubérculos',g:'tuberculo',p:1,c:12,f:0,k:52,u:'40g'},
-{n:'Arracacha',cat:'🥔 Tubérculos',g:'tuberculo',p:1,c:16,f:0,k:68,u:'70g'},
-{n:'Batata',cat:'🥔 Tubérculos',g:'tuberculo',p:1,c:12,f:0,k:52,u:'50g'},
-{n:'Ñame',cat:'🥔 Tubérculos',g:'tuberculo',p:2,c:14,f:0,k:64,u:'53g'},
-{n:'Fríjol blanquillo',cat:'🫘 Leguminosas',g:'leguminosa',p:4,c:14,f:1,k:81,u:'60g · ½ cucharón'},
-{n:'Fríjol bola roja',cat:'🫘 Leguminosas',g:'leguminosa',p:4,c:14,f:1,k:81,u:'65g'},
-{n:'Garbanzo con guiso',cat:'🫘 Leguminosas',g:'leguminosa',p:5,c:14,f:2,k:94,u:'50g'},
-{n:'Lenteja con guiso',cat:'🫘 Leguminosas',g:'leguminosa',p:6,c:15,f:1,k:93,u:'70g'},
-{n:'Arveja verde',cat:'🫘 Leguminosas',g:'leguminosa',p:3,c:9,f:0,k:48,u:'42g · 3 cdas'},
-{n:'Banano / guineo',cat:'🍊 Frutas',g:'fruta',p:1,c:16,f:0,k:68,u:'65g · 1 und'},
-{n:'Fresas (9 und)',cat:'🍊 Frutas',g:'fruta',p:1,c:11,f:0,k:48,u:'161g'},
-{n:'Granadilla',cat:'🍊 Frutas',g:'fruta',p:2,c:15,f:0,k:68,u:'100g · 1 und'},
-{n:'Guayaba criolla',cat:'🍊 Frutas',g:'fruta',p:2,c:14,f:1,k:73,u:'105g · 1 und'},
-{n:'Kiwi',cat:'🍊 Frutas',g:'fruta',p:1,c:13,f:0,k:56,u:'82g · 1 und'},
-{n:'Mango',cat:'🍊 Frutas',g:'fruta',p:1,c:15,f:0,k:64,u:'112g · 1 und'},
-{n:'Manzana con cáscara',cat:'🍊 Frutas',g:'fruta',p:0,c:15,f:0,k:60,u:'112g · 1 und'},
-{n:'Maracuyá',cat:'🍊 Frutas',g:'fruta',p:2,c:12,f:0,k:56,u:'66g · 1 und'},
-{n:'Naranja',cat:'🍊 Frutas',g:'fruta',p:1,c:17,f:0,k:72,u:'147g · 1 und'},
-{n:'Papaya',cat:'🍊 Frutas',g:'fruta',p:1,c:14,f:0,k:60,u:'128g · 1 trozo'},
-{n:'Piña',cat:'🍊 Frutas',g:'fruta',p:0,c:13,f:0,k:52,u:'110g · 1 tajada'},
-{n:'Tomate de árbol (2)',cat:'🍊 Frutas',g:'fruta',p:2,c:13,f:0,k:60,u:'174g'},
-{n:'Uchuva (17 und)',cat:'🍊 Frutas',g:'fruta',p:2,c:12,f:1,k:65,u:'68g'},
-{n:'Lulo (2 und)',cat:'🍊 Frutas',g:'fruta',p:1,c:12,f:0,k:52,u:'196g'},
-{n:'Mora',cat:'🍊 Frutas',g:'fruta',p:1,c:12,f:0,k:52,u:'96g'},
-{n:'Auyama',cat:'🥦 Verduras',g:'verdura',p:1,c:5,f:0,k:24,u:'68g · 1 trozo'},
-{n:'Brócoli crudo',cat:'🥦 Verduras',g:'verdura',p:3,c:6,f:0,k:37,u:'89g · 1 pocillo'},
-{n:'Champiñones',cat:'🥦 Verduras',g:'verdura',p:2,c:4,f:0,k:24,u:'93g · ½ pocillo'},
-{n:'Cidra',cat:'🥦 Verduras',g:'verdura',p:1,c:5,f:0,k:24,u:'177g · ½ und'},
-{n:'Coliflor',cat:'🥦 Verduras',g:'verdura',p:2,c:5,f:0,k:29,u:'86g · 3 gajos'},
-{n:'Habichuela',cat:'🥦 Verduras',g:'verdura',p:2,c:5,f:0,k:29,u:'81g'},
-{n:'Pimentón rojo',cat:'🥦 Verduras',g:'verdura',p:1,c:7,f:0,k:36,u:'111g · 1 und'},
-{n:'Remolacha cocida',cat:'🥦 Verduras',g:'verdura',p:1,c:7,f:0,k:32,u:'57g · ½ und'},
-{n:'Tomate chonto',cat:'🥦 Verduras',g:'verdura',p:1,c:4,f:0,k:21,u:'118g · 1 und'},
-{n:'Zanahoria',cat:'🥦 Verduras',g:'verdura',p:1,c:6,f:0,k:28,u:'58g'},
-{n:'Lechuga / espinaca',cat:'🥦 Verduras',g:'verdura',p:1,c:1,f:0,k:8,u:'libre'},
-{n:'Pepino cohombro',cat:'🥦 Verduras',g:'verdura',p:0,c:2,f:0,k:10,u:'libre'},
-{n:'Ensalada mixta',cat:'🥦 Verduras',g:'verdura',p:2,c:4,f:1,k:33,u:'1 plato'},
-{n:'Aguacate Hass (¼)',cat:'🥑 Grasas',g:'grasa',p:1,c:3,f:7,k:77,u:'30g · ¼ und'},
-{n:'Aguacate Hass (½)',cat:'🥑 Grasas',g:'grasa',p:2,c:6,f:14,k:154,u:'60g · ½ und'},
-{n:'Aceite de oliva (1 cda)',cat:'🥑 Grasas',g:'grasa',p:0,c:0,f:5,k:45,u:'5g · 1 cda'},
-{n:'Aceitunas (12 und)',cat:'🥑 Grasas',g:'grasa',p:0,c:2,f:5,k:57,u:'40g'},
-{n:'Margarina light',cat:'🥑 Grasas',g:'grasa',p:0,c:0,f:5,k:45,u:'6g · 2 cdas'},
-{n:'Mantequilla de maní',cat:'🥑 Grasas',g:'grasa',p:2,c:2,f:4,k:54,u:'8g · 1 cda'},
-{n:'Almendras (3 und)',cat:'🥑 Grasas',g:'grasa',p:1,c:1,f:3,k:37,u:'9g'},
-{n:'Nuez del nogal (2)',cat:'🥑 Grasas',g:'grasa',p:1,c:1,f:5,k:53,u:'8g'},
-{n:'Maní sin sal',cat:'🥑 Grasas',g:'grasa',p:2,c:2,f:4,k:54,u:'10g · 1 cda'},
-{n:'Yogurt griego (100ml)',cat:'🥛 Lácteos',g:'lacteo',p:8,c:5,f:2,k:70,u:'100cc'},
-{n:'Yogurt natural (200ml)',cat:'🥛 Lácteos',g:'lacteo',p:6,c:10,f:3,k:91,u:'200cc'},
-{n:'Kumis (200ml)',cat:'🥛 Lácteos',g:'lacteo',p:6,c:10,f:3,k:91,u:'200ml'},
-{n:'Leche entera (200ml)',cat:'🥛 Lácteos',g:'lacteo',p:7,c:12,f:8,k:148,u:'200ml'},
-{n:'Agua pura',cat:'💧 Bebidas',g:'bebida',p:0,c:0,f:0,k:0,u:'pequeños sorbos'},
-{n:'Aromática / infusión',cat:'💧 Bebidas',g:'bebida',p:0,c:1,f:0,k:4,u:'sin azúcar'},
-{n:'Té verde sin azúcar',cat:'💧 Bebidas',g:'bebida',p:0,c:0,f:0,k:2,u:'sin azúcar'},
-{n:'Café negro sin azúcar',cat:'💧 Bebidas',g:'bebida',p:0,c:0,f:0,k:2,u:'sin azúcar'},
-{n:'Café con 1 cdita azúcar',cat:'💧 Bebidas',g:'bebida',p:0,c:4,f:0,k:18,u:'1 taza + 1 cdita azúcar'},
-{n:'Coca Cola Zero',cat:'💧 Bebidas',g:'bebida',p:0,c:0,f:0,k:1,u:'355ml · 1 lata'},
-{n:'Jugo de fruta natural',cat:'💧 Bebidas',g:'bebida',p:1,c:14,f:0,k:60,u:'sin azúcar · 1 vaso'},
-{n:'Caldo de pollo',cat:'💧 Bebidas',g:'bebida',p:4,c:1,f:1,k:29,u:'1 taza'},
-{n:'Miel de abejas',cat:'🍯 Extras',g:'extra',p:0,c:9,f:0,k:36,u:'10g · 1 cda'},
-{n:'Panela en polvo',cat:'🍯 Extras',g:'extra',p:0,c:13,f:0,k:52,u:'13g · 1 cda'},
-{n:'Arequipe',cat:'🍯 Extras',g:'extra',p:2,c:12,f:3,k:83,u:'15g · 1 cda'},
-{n:'Gelatina sin azúcar',cat:'🍯 Extras',g:'extra',p:2,c:0,f:0,k:8,u:'libre'},
-{n:'Arroz con pollo',cat:'🍱 Preparaciones',g:'mixto',p:18,c:22,f:4,k:196,u:'~200g'},
-{n:'Pollo con verduras',cat:'🍱 Preparaciones',g:'mixto',p:24,c:8,f:5,k:173,u:'1 plato'},
-{n:'Pasta con pollo',cat:'🍱 Preparaciones',g:'mixto',p:20,c:25,f:5,k:225,u:'~200g'},
-{n:'Fríjoles con arroz',cat:'🍱 Preparaciones',g:'mixto',p:8,c:28,f:2,k:162,u:'1 plato'},
-{n:'Ensalada de atún',cat:'🍱 Preparaciones',g:'mixto',p:22,c:4,f:3,k:131,u:'1 plato'},
-{n:'Sopa de verduras',cat:'🍱 Preparaciones',g:'mixto',p:3,c:10,f:1,k:61,u:'1 taza'},
-{n:'Huevos revueltos con queso',cat:'🍱 Preparaciones',g:'mixto',p:14,c:1,f:13,k:181,u:'2 huevos + 20g queso'},
-{n:'Ensalada con vinagreta',cat:'🍱 Preparaciones',g:'mixto',p:2,c:5,f:5,k:73,u:'1 plato'},
-{n:'Hamburguesa',cat:'🍱 Preparaciones',g:'mixto',p:20,c:25,f:15,k:315,u:'1 und mediana'},
-{n:'Empanada al horno',cat:'🍱 Preparaciones',g:'mixto',p:8,c:19,f:5,k:153,u:'80g · 1 und'},
-{n:'Sandwich jamón y queso',cat:'🍱 Preparaciones',g:'mixto',p:18,c:28,f:14,k:310,u:'200g'},
-{n:'Zenú Salchicha',cat:'🥩 Zenú',g:'proteina',p:6,c:2,f:8,k:104,u:'50g · 1 und'},
-{n:'Zenú Mortadela',cat:'🥩 Zenú',g:'sustituto',p:5,c:3,f:7,k:95,u:'40g · 2 tajadas'},
-{n:'Zenú Jamón',cat:'🥩 Zenú',g:'sustituto',p:7,c:2,f:3,k:63,u:'46g · 2 tajadas'},
-{n:'Zenú Tocineta',cat:'🥩 Zenú',g:'grasa',p:4,c:0,f:9,k:97,u:'30g · 2 tiras'},
-{n:'Alpina Kumis',cat:'🥛 Alpina',g:'lacteo',p:5,c:12,f:2,k:86,u:'200ml'},
-{n:'Alpina Yogurt Griego',cat:'🥛 Alpina',g:'lacteo',p:9,c:6,f:2,k:74,u:'100g'},
-{n:'Alpina Bon Yurt',cat:'🥛 Alpina',g:'lacteo',p:4,c:14,f:2,k:90,u:'150ml'},
-{n:'Colanta Leche entera',cat:'🥛 Colanta',g:'lacteo',p:7,c:11,f:8,k:142,u:'200ml'},
-{n:'Colanta Yogurt natural',cat:'🥛 Colanta',g:'lacteo',p:6,c:10,f:3,k:91,u:'200g'},
-{n:'D1 Avena en hojuelas',cat:'🛒 D1 y Ara',g:'cereal',p:4,c:18,f:2,k:106,u:'30g · 5 cdas'},
-{n:'D1 Galleta integral',cat:'🛒 D1 y Ara',g:'cereal',p:2,c:11,f:2,k:70,u:'20g · 3 und'},
-{n:'Ara Atún en agua',cat:'🛒 D1 y Ara',g:'proteina',p:26,c:0,f:1,k:113,u:'110g · 1 lata'},
-{n:'Salchicha alemana (1 und)',cat:'🍖 Embutidos',g:'proteina',p:9,c:2,f:15,k:175,u:'60g · 1 und'},
-{n:'Chorizo de cerdo',cat:'🍖 Embutidos',g:'proteina',p:8,c:1,f:16,k:181,u:'50g · 1 und'},
-{n:'Morcilla',cat:'🍖 Embutidos',g:'mixto',p:5,c:8,f:12,k:164,u:'50g · 1 und'},
-{n:'Chuleta de cerdo magra',cat:'🍖 Embutidos',g:'proteina',p:25,c:0,f:5,k:145,u:'100g'},
-{n:'Wrap tortilla trigo',cat:'🥙 Sandwiches',g:'cereal',p:4,c:26,f:4,k:156,u:'45g · 1 tortilla'},
-{n:'Pandebono (1 und)',cat:'🥖 Panes',g:'cereal',p:4,c:16,f:7,k:143,u:'50g · 1 unidad'},
-{n:'Galleta de arroz (2 und)',cat:'🥖 Panes',g:'cereal',p:1,c:14,f:0,k:60,u:'16g · 2 und'},
-{n:'Achiras del Huila',cat:'🥙 Típicos',g:'extra',p:2,c:17,f:6,k:128,u:'30g · 5 palitos'},
-{n:'Agua de panela (1 taza)',cat:'💧 Bebidas',g:'bebida',p:0,c:12,f:0,k:48,u:'240ml'},
-{n:'Kefir (200ml)',cat:'🥛 Lácteos',g:'lacteo',p:7,c:8,f:4,k:100,u:'200ml · 1 vaso'},
-{n:'Lentejas cocidas (100g)',cat:'🫘 Leguminosas',g:'leguminosa',p:9,c:20,f:1,k:125,u:'100g cocido'},
-{n:'Pollo desmechado guisado',cat:'🍱 Preparaciones',g:'mixto',p:22,c:3,f:4,k:140,u:'100g · 5 cdas'},
-{n:'60g espinaca salteada aceite oliva',cat:'🥦 Verduras',g:'verdura',p:2,c:2,f:5,k:54,u:'60g + 1 cdita aceite'},
-{n:'Aceite de oliva (1 cdita)',cat:'🥑 Grasas',g:'grasa',p:0,c:0,f:5,k:40,u:'5g · 1 cucharadita'},
-{n:'Aceite de canola (1 cdita)',cat:'🥑 Grasas',g:'grasa',p:0,c:0,f:5,k:40,u:'5g · 1 cucharadita'},
-{n:'Platano maduro (1/8)',cat:'🥔 Tubérculos',g:'tuberculo',p:1,c:14,f:0,k:58,u:'51g · 1/8 plátano'},
-{n:'Platano verde cocido (100g)',cat:'🥔 Tubérculos',g:'tuberculo',p:1,c:26,f:0,k:109,u:'100g · 1/2 plátano mediano'},
-{n:'Banano mediano',cat:'🍊 Frutas',g:'fruta',p:1,c:23,f:0,k:96,u:'100g · 1 unidad mediana'},
-{n:'Arepa de maiz blanco mediana',cat:'🍚 Cereales',g:'cereal',p:2,c:20,f:1,k:97,u:'60g · 1 arepa mediana asada'},
-{n:'Arepa de chocolo',cat:'🍚 Cereales',g:'cereal',p:4,c:22,f:3,k:131,u:'80g · 1 arepa pequeña'},
-{n:'Mantequilla Rama (1 cdita)',cat:'🥑 Grasas',g:'grasa',p:0,c:0,f:4,k:36,u:'5g · 1 cdita'},
-{n:'Yogurt natural entero (200g)',cat:'🥛 Lácteos',g:'lacteo',p:6,c:11,f:4,k:104,u:'200g · 1 vaso pequeño'},
-{n:'Champiñones frescos (1/2 pocillo)',cat:'🥦 Verduras',g:'verdura',p:3,c:3,f:0,k:22,u:'85g · 1/2 pocillo laminados'},
-{n:'Galletas Festival (3 und)',cat:'🥖 Panes',g:'extra',p:2,c:21,f:5,k:137,u:'30g · 3 und'},
-{n:'Panela rallada (1 cda)',cat:'🍯 Extras',g:'extra',p:0,c:13,f:0,k:52,u:'13g · 1 cda sopera'},
-{n:'Huevo entero (2 und)',cat:'🍗 Carnes',g:'proteina',p:12,c:1,f:10,k:144,u:'100g · 2 unidades'},
-{n:'Queso munster',cat:'🧀 Quesos',g:'sustituto',p:7,c:0,f:8,k:100,u:'30g · 1 loncha'},
-{n:'2 huevos cacerola con aceite oliva',cat:'🍗 Carnes',g:'proteina',p:12,c:1,f:15,k:184,u:'2 huevos + 1 cdita aceite oliva'},
-{n:'Huevo revuelto (2 und)',cat:'🍗 Carnes',g:'proteina',p:12,c:1,f:12,k:156,u:'2 huevos con 1 cdita aceite'},
-{n:'Carne molida magra',cat:'🍗 Carnes',g:'proteina',p:18,c:0,f:10,k:162,u:'100g cocida'},
-{n:'Huevo en cacerola (1 und)',cat:'🍗 Carnes',g:'proteina',p:6,c:0,f:5,k:73,u:'50g · 1 und · con aceite'},
-{n:'Huevo en cacerola (2 und)',cat:'🍗 Carnes',g:'proteina',p:12,c:1,f:10,k:150,u:'100g · 2 und · con aceite'},
 
-// ── CENAS RÁPIDAS ──
-{n:'Sándwich jamón Pietran y mozzarella',cat:'🥙 Cenas rápidas',g:'mixto',p:28,c:37,f:14,k:404,u:'2 taj pan + 2 taj jamón + 2 taj queso'},
-{n:'Sándwich jamón Pietran + mozzarella + aguacate',cat:'🥙 Cenas rápidas',g:'mixto',p:29,c:40,f:21,k:481,u:'2 taj pan + 2 taj jamón + 2 taj queso + ¼ aguacate'},
-{n:'Tostadas con atún',cat:'🥙 Cenas rápidas',g:'mixto',p:34,c:30,f:6,k:310,u:'2 taj pan tostado + 1 lata atún + tomate'},
-{n:'Sándwich pavo y aguacate',cat:'🥙 Cenas rápidas',g:'mixto',p:26,c:35,f:16,k:390,u:'2 taj pan + 3 taj jamón pavo + 1 taj queso + ¼ aguacate'},
-{n:'Huevo con queso y pan',cat:'🥙 Cenas rápidas',g:'mixto',p:23,c:20,f:22,k:370,u:'2 huevos + 1 taj queso campesino + 1 taj pan + tomate'},
-{n:'Wrap jamón y queso',cat:'🥙 Cenas rápidas',g:'mixto',p:22,c:30,f:12,k:320,u:'1 tortilla + 2 taj jamón + 1 taj queso + espinaca + mostaza'},
-{n:'Quesadilla rápida',cat:'🥙 Cenas rápidas',g:'mixto',p:18,c:28,f:14,k:310,u:'1 tortilla + 2 taj queso + 1 taj jamón · sartén 3 min'},
-{n:'Mini tabla nocturna',cat:'🥙 Cenas rápidas',g:'mixto',p:20,c:14,f:14,k:270,u:'3 taj jamón + 2 taj queso + 6 aceitunas + 2 galletas arroz'},
-{n:'Jamón Pietran cerdo (2 tajadas)',cat:'🥙 Cenas rápidas',g:'sustituto',p:12,c:4,f:2,k:94,u:'41g · 2 tajadas · Pietran'},
-{n:'Jamón pavo Pietran (2 tajadas)',cat:'🥙 Cenas rápidas',g:'sustituto',p:8,c:3,f:0,k:44,u:'41g · 2 tajadas · más proteína, menos grasa'},
+// ════════════════════════════════════════════════════════
+// 🥚 HUEVOS — porciones exactas con aceite real
+// Huevo AA: 60g · p:7g · g:5g · k:77kcal
+// Aceite oliva 1 cdita (5ml): p:0 · c:0 · f:5 · k:40kcal
+// ════════════════════════════════════════════════════════
+{n:'Huevo en cacerola (1 und AA)',cat:'🥚 Huevos',g:'proteina',p:7,c:0,f:10,k:117,u:'60g huevo + 5ml aceite oliva · sartén · SIN revolver'},
+{n:'Huevo en cacerola (2 und AA)',cat:'🥚 Huevos',g:'proteina',p:14,c:0,f:15,k:194,u:'120g huevo + 5ml aceite oliva · sartén'},
+{n:'Huevo revuelto (1 und)',cat:'🥚 Huevos',g:'proteina',p:7,c:0,f:10,k:117,u:'60g huevo + 5ml aceite oliva · batido en sartén'},
+{n:'Huevo revuelto (2 und)',cat:'🥚 Huevos',g:'proteina',p:14,c:0,f:15,k:194,u:'120g huevo + 5ml aceite oliva · batido'},
+{n:'Huevo revuelto (2 und) + jamón Pietran',cat:'🥚 Huevos',g:'proteina',p:20,c:2,f:16,k:234,u:'2 huevos + 5ml aceite + 2 taj jamón Pietran cerdo'},
+{n:'Huevo revuelto (2 und) + queso campesino',cat:'🥚 Huevos',g:'proteina',p:19,c:1,f:19,k:254,u:'2 huevos + 5ml aceite + 30g queso campesino'},
+{n:'Huevo revuelto (2 und) + mozzarella',cat:'🥚 Huevos',g:'proteina',p:20,c:1,f:20,k:267,u:'2 huevos + 5ml aceite + 50g mozzarella'},
+{n:'Huevo cocido duro (1 und)',cat:'🥚 Huevos',g:'proteina',p:6,c:0,f:5,k:68,u:'50g sin cascara · sin aceite'},
+{n:'Huevo cocido duro (2 und)',cat:'🥚 Huevos',g:'proteina',p:12,c:0,f:10,k:136,u:'100g · 2 und · sin aceite'},
+{n:'Tortilla 2 huevos + queso + jamón',cat:'🥚 Huevos',g:'proteina',p:22,c:2,f:18,k:262,u:'2 huevos + 30g queso + 2 taj jamón + aceite'},
 
-// ── CARBOHIDRATOS COMPLETOS ──
-{n:'Avena cocinada con leche',cat:'🌾 Carbos completos',g:'cereal',p:8,c:28,f:4,k:180,u:'40g avena + 200ml leche descremada'},
-{n:'Avena overnight con banano',cat:'🌾 Carbos completos',g:'cereal',p:7,c:35,f:4,k:200,u:'30g avena + 150ml leche + ½ banano · sin cocinar'},
-{n:'Tostadas de pan integral con mantequilla de maní',cat:'🌾 Carbos completos',g:'cereal',p:8,c:30,f:9,k:237,u:'2 taj pan integral + 1 cda mantequilla maní'},
-{n:'Arroz con fríjoles (media taza c/u)',cat:'🌾 Carbos completos',g:'mixto',p:10,c:42,f:2,k:226,u:'½ taza arroz + ½ taza fríjoles cocidos'},
-{n:'Papa asada con queso',cat:'🌾 Carbos completos',g:'tuberculo',p:8,c:22,f:5,k:165,u:'1 papa mediana + 30g queso campesino'},
-{n:'Plátano asado con queso',cat:'🌾 Carbos completos',g:'tuberculo',p:6,c:28,f:4,k:172,u:'½ plátano maduro asado + 30g queso'},
-{n:'Yuca con hogao',cat:'🌾 Carbos completos',g:'tuberculo',p:2,c:30,f:3,k:155,u:'100g yuca cocida + hogao casero'},
-{n:'Mazorca desgranada con sal y limón',cat:'🌾 Carbos completos',g:'cereal',p:4,c:25,f:2,k:133,u:'1 mazorca mediana desgranada'},
-{n:'Pan integral con aguacate',cat:'🌾 Carbos completos',g:'cereal',p:4,c:28,f:8,k:196,u:'2 taj pan integral + ¼ aguacate'},
-{n:'Granola con yogurt griego',cat:'🌾 Carbos completos',g:'cereal',p:11,c:30,f:5,k:209,u:'30g granola + 100g yogurt griego'},
-{n:'Arepa con huevo y queso',cat:'🌾 Carbos completos',g:'mixto',p:16,c:18,f:12,k:244,u:'1 arepa mediana + 1 huevo + 30g queso'},
-{n:'Pasta con atún y tomate',cat:'🌾 Carbos completos',g:'mixto',p:28,c:38,f:4,k:300,u:'60g pasta cocida + 1 lata atún + salsa tomate'},
-{n:'Arroz integral con pollo',cat:'🌾 Carbos completos',g:'mixto',p:28,c:32,f:5,k:285,u:'½ taza arroz integral + 80g pechuga'},
-{n:'Tostada francesa (2 rebanadas)',cat:'🌾 Carbos completos',g:'cereal',p:12,c:28,f:8,k:232,u:'2 taj pan + 2 huevos batidos + canela · sartén'},
-{n:'Mazamorra con leche y panela',cat:'🌾 Carbos completos',g:'cereal',p:5,c:32,f:3,k:175,u:'1 pocillo mazamorra + leche + pizca panela'},
-{n:'Calentado antioqueño liviano',cat:'🌾 Carbos completos',g:'mixto',p:14,c:30,f:6,k:230,u:'½ taza fríjol + ½ taza arroz + 1 huevo'},
+// ════════════════════════════════════════════════════════
+// 🍗 CARNES Y AVES
+// ════════════════════════════════════════════════════════
+{n:'Pechuga de pollo (½ pechuga 80g)',cat:'🍗 Carnes',g:'proteina',p:25,c:0,f:3,k:131,u:'80g cocida · ½ pechuga mediana'},
+{n:'Pechuga de pollo (1 pechuga 160g)',cat:'🍗 Carnes',g:'proteina',p:50,c:0,f:6,k:262,u:'160g cocida · 1 pechuga completa'},
+{n:'Pollo desmechado (4 cdas 70g)',cat:'🍗 Carnes',g:'proteina',p:18,c:0,f:3,k:99,u:'70g · 4 cucharadas soperas · sin guiso'},
+{n:'Pollo desmechado guisado (5 cdas)',cat:'🍗 Carnes',g:'proteina',p:22,c:3,f:4,k:140,u:'100g · 5 cdas · con hogao casero'},
+{n:'Contramuslo de pollo asado',cat:'🍗 Carnes',g:'proteina',p:22,c:0,f:5,k:133,u:'86g sin piel · 1 unidad'},
+{n:'Muslo de pollo asado',cat:'🍗 Carnes',g:'proteina',p:20,c:0,f:6,k:130,u:'75g sin piel · 1 unidad'},
+{n:'Pollo en cubitos salteados',cat:'🍗 Carnes',g:'proteina',p:22,c:0,f:8,k:164,u:'80g pollo + 5ml aceite oliva · salteado'},
+{n:'Atún en agua (1 lata 170g escurrido)',cat:'🍗 Carnes',g:'proteina',p:38,c:0,f:2,k:170,u:'170g escurrido · 1 lata estándar'},
+{n:'Atún en agua (½ lata 85g)',cat:'🍗 Carnes',g:'proteina',p:19,c:0,f:1,k:85,u:'85g escurrido · media lata'},
+{n:'Carne molida magra (½ taza 50g)',cat:'🍗 Carnes',g:'proteina',p:11,c:0,f:5,k:87,u:'50g cocida · ½ taza'},
+{n:'Carne molida magra (100g)',cat:'🍗 Carnes',g:'proteina',p:21,c:0,f:10,k:174,u:'100g cocida · escurrida'},
+{n:'Carne de res a la plancha (100g)',cat:'🍗 Carnes',g:'proteina',p:26,c:0,f:8,k:176,u:'100g filete magro · plancha'},
+{n:'Chuleta de cerdo magra (100g)',cat:'🍗 Carnes',g:'proteina',p:25,c:0,f:5,k:145,u:'100g · sin hueso · a la plancha'},
 
-// ── MERIENDAS CON CARBOS ──
-{n:'Banano con mantequilla de maní',cat:'🍎 Meriendas',g:'fruta',p:4,c:24,f:5,k:157,u:'1 banano + 1 cdita mantequilla maní'},
-{n:'Manzana con queso campesino',cat:'🍎 Meriendas',g:'fruta',p:6,c:16,f:4,k:120,u:'1 manzana + 30g queso'},
-{n:'Galletas de arroz con aguacate',cat:'🍎 Meriendas',g:'cereal',p:2,c:18,f:8,k:154,u:'3 galletas arroz + ¼ aguacate'},
-{n:'Yogurt griego con granola y fruta',cat:'🍎 Meriendas',g:'lacteo',p:12,c:28,f:4,k:196,u:'100g yogurt + 20g granola + ½ taza fruta'},
-{n:'Tostada con arequipe y queso',cat:'🍎 Meriendas',g:'cereal',p:5,c:22,f:5,k:153,u:'1 taj pan tostado + 1 cda arequipe + 30g queso'},
-{n:'Aguacate con galletas Saltinas',cat:'🍎 Meriendas',g:'grasa',p:3,c:18,f:10,k:174,u:'¼ aguacate + 2 tablas Saltinas'},
+// ════════════════════════════════════════════════════════
+// 🧀 QUESOS
+// ════════════════════════════════════════════════════════
+{n:'Queso campesino (1 tajada 30g)',cat:'🧀 Quesos',g:'sustituto',p:5,c:1,f:4,k:60,u:'30g · 1 tajada delgada'},
+{n:'Queso campesino (2 tajadas 60g)',cat:'🧀 Quesos',g:'sustituto',p:10,c:2,f:8,k:120,u:'60g · 2 tajadas'},
+{n:'Queso fresco / cuajada (1 taj 30g)',cat:'🧀 Quesos',g:'sustituto',p:5,c:1,f:4,k:60,u:'30g · 1 tajada semigruesa'},
+{n:'Mozzarella (1 tajada 25g)',cat:'🧀 Quesos',g:'sustituto',p:5,c:0,f:5,k:65,u:'25g · 1 loncha · D1/Éxito'},
+{n:'Mozzarella (2 tajadas 50g)',cat:'🧀 Quesos',g:'sustituto',p:10,c:0,f:10,k:130,u:'50g · 2 lonchas'},
+{n:'Queso Cheddar (1 loncha 20g)',cat:'🧀 Quesos',g:'sustituto',p:4,c:0,f:6,k:70,u:'20g · 1 loncha delgada'},
+{n:'Queso Cheddar (2 lonchas 40g)',cat:'🧀 Quesos',g:'sustituto',p:8,c:0,f:12,k:140,u:'40g · 2 lonchas'},
+{n:'Queso munster (1 loncha 30g)',cat:'🧀 Quesos',g:'sustituto',p:7,c:0,f:8,k:100,u:'30g · 1 loncha gruesa'},
+{n:'Quesito antioqueño (1 und 40g)',cat:'🧀 Quesos',g:'sustituto',p:6,c:1,f:5,k:73,u:'40g · 1 quesito individual'},
 
-// ── MANÍ Y FRUTOS SECOS — MARCAS COLOMBIANAS ──
-// Datos de etiquetas reales (Fitia Colombia / OpenFoodFacts)
+// ════════════════════════════════════════════════════════
+// 🥩 EMBUTIDOS PIETRAN / ZENÚ
+// Datos etiqueta real Pietran
+// ════════════════════════════════════════════════════════
+{n:'Jamón Pietran cerdo (2 taj 41g)',cat:'🥩 Embutidos',g:'sustituto',p:6,c:4,f:1,k:47,u:'41g · 2 tajadas · etiqueta real Pietran'},
+{n:'Jamón Pietran cerdo (4 taj 82g)',cat:'🥩 Embutidos',g:'sustituto',p:12,c:8,f:2,k:94,u:'82g · 4 tajadas'},
+{n:'Jamón pavo Pietran (2 taj 41g)',cat:'🥩 Embutidos',g:'sustituto',p:8,c:3,f:0,k:44,u:'41g · 2 tajadas · más proteína menos grasa'},
+{n:'Jamón pavo Pietran (4 taj 82g)',cat:'🥩 Embutidos',g:'sustituto',p:16,c:6,f:0,k:88,u:'82g · 4 tajadas'},
+{n:'Salchicha alemana (1 und 60g)',cat:'🥩 Embutidos',g:'proteina',p:9,c:2,f:15,k:175,u:'60g · 1 und tipo Bratwurst'},
+{n:'Salchicha Zenú (1 und 50g)',cat:'🥩 Embutidos',g:'proteina',p:6,c:2,f:8,k:104,u:'50g · 1 und · Zenú'},
+{n:'Chorizo de cerdo (1 und 50g)',cat:'🥩 Embutidos',g:'proteina',p:8,c:1,f:16,k:181,u:'50g · 1 und · parrilla o frito'},
+{n:'Salami (3 tajadas 45g)',cat:'🥩 Embutidos',g:'proteina',p:7,c:1,f:10,k:122,u:'45g · 3 tajadas curadas'},
+{n:'Morcilla (1 und 50g)',cat:'🥩 Embutidos',g:'mixto',p:5,c:8,f:12,k:164,u:'50g · 1 unidad · ocasional'},
 
-// — MANÍ —
-{n:'Maní La Especial salado (30g)',cat:'🥜 Maní y frutos secos',g:'grasa',p:7,c:5,f:16,k:200,u:'30g · 1 paquete · La Especial'},
-{n:'Maní La Especial salado (50g)',cat:'🥜 Maní y frutos secos',g:'grasa',p:12,c:8,f:27,k:333,u:'50g · paquete grande · La Especial'},
-{n:'Maní La Especial limón pimienta (30g)',cat:'🥜 Maní y frutos secos',g:'grasa',p:7,c:6,f:15,k:189,u:'30g · 1 paquete · La Especial'},
-{n:'Maní Kraks La Especial (30g)',cat:'🥜 Maní y frutos secos',g:'grasa',p:4,c:16,f:7,k:140,u:'30g · maní con cobertura crocante'},
-{n:'Maní con sal Sunshine/Maniyur (30g)',cat:'🥜 Maní y frutos secos',g:'grasa',p:7,c:5,f:15,k:190,u:'30g · ¼ taza'},
-{n:'Maní tostado sin sal (1 cda)',cat:'🥜 Maní y frutos secos',g:'grasa',p:4,c:3,f:8,k:95,u:'15g · 1 cucharada sopera'},
-{n:'Maní tostado sin sal (puñado 30g)',cat:'🥜 Maní y frutos secos',g:'grasa',p:7,c:5,f:15,k:170,u:'30g · puñado pequeño · sin sal ideal'},
+// ════════════════════════════════════════════════════════
+// 🥛 LÁCTEOS — medias y porciones completas
+// ════════════════════════════════════════════════════════
+{n:'Leche entera (½ vaso 100ml)',cat:'🥛 Lácteos',g:'lacteo',p:3,c:5,f:4,k:67,u:'100ml · ½ vaso · Colanta/Alpina'},
+{n:'Leche entera (1 vaso 200ml)',cat:'🥛 Lácteos',g:'lacteo',p:7,c:10,f:8,k:136,u:'200ml · 1 vaso'},
+{n:'Leche descremada (½ vaso 100ml)',cat:'🥛 Lácteos',g:'lacteo',p:4,c:5,f:0,k:34,u:'100ml · ½ vaso · sin grasa'},
+{n:'Leche descremada (1 vaso 200ml)',cat:'🥛 Lácteos',g:'lacteo',p:7,c:10,f:0,k:68,u:'200ml · 1 vaso · sin grasa'},
+{n:'Yogurt griego (½ pocillo 100g)',cat:'🥛 Lácteos',g:'lacteo',p:8,c:5,f:2,k:70,u:'100g · ½ pocillo · Alpina/Colanta sin azúcar'},
+{n:'Yogurt griego (1 pocillo 200g)',cat:'🥛 Lácteos',g:'lacteo',p:16,c:10,f:4,k:140,u:'200g · 1 pocillo completo'},
+{n:'Yogurt natural entero (1 vaso 200g)',cat:'🥛 Lácteos',g:'lacteo',p:6,c:11,f:4,k:104,u:'200g · 1 vaso · con azúcar natural'},
+{n:'Kefir (½ vaso 100ml)',cat:'🥛 Lácteos',g:'lacteo',p:4,c:4,f:2,k:50,u:'100ml · ½ vaso · probiótico'},
+{n:'Kefir (1 vaso 200ml)',cat:'🥛 Lácteos',g:'lacteo',p:7,c:8,f:4,k:100,u:'200ml · 1 vaso'},
+{n:'Kumis Alpina (1 vaso 200ml)',cat:'🥛 Lácteos',g:'lacteo',p:6,c:12,f:2,k:90,u:'200ml · Alpina · probiótico'},
 
-// — MEZCLAS —
-{n:'La Especial mezcla nueces+maní+almendras+marañones (30g)',cat:'🥜 Maní y frutos secos',g:'grasa',p:7,c:5,f:16,k:200,u:'30g · 2 cdas · La Especial'},
-{n:'La Especial mezcla maní+arándanos (40g)',cat:'🥜 Maní y frutos secos',g:'grasa',p:7,c:14,f:13,k:209,u:'40g · 1 sobre · La Especial'},
-{n:'La Especial mezcla 50g',cat:'🥜 Maní y frutos secos',g:'grasa',p:12,c:8,f:27,k:333,u:'50g · paquete mediano'},
+// ════════════════════════════════════════════════════════
+// 🍚 CEREALES — porciones reales
+// ════════════════════════════════════════════════════════
+{n:'Arroz blanco cocido (2 cdas 50g)',cat:'🍚 Cereales',g:'cereal',p:1,c:14,f:0,k:60,u:'50g · 2 cdas · media porción'},
+{n:'Arroz blanco cocido (4 cdas 100g)',cat:'🍚 Cereales',g:'cereal',p:2,c:28,f:0,k:120,u:'100g · 4 cdas · porción estándar'},
+{n:'Arroz integral cocido (4 cdas 100g)',cat:'🍚 Cereales',g:'cereal',p:3,c:26,f:1,k:123,u:'100g · 4 cdas'},
+{n:'Avena en hojuelas (3 cdas 30g)',cat:'🍚 Cereales',g:'cereal',p:4,c:20,f:2,k:110,u:'30g · 3 cdas soperas · cruda'},
+{n:'Avena en hojuelas (5 cdas 50g)',cat:'🍚 Cereales',g:'cereal',p:6,c:33,f:3,k:183,u:'50g · 5 cdas · cruda'},
+{n:'Pan integral (1 tajada 32g)',cat:'🍚 Cereales',g:'cereal',p:3,c:15,f:1,k:81,u:'32g · 1 tajada estándar'},
+{n:'Pan integral (2 tajadas 64g)',cat:'🍚 Cereales',g:'cereal',p:6,c:30,f:2,k:162,u:'64g · 2 tajadas · para sándwich'},
+{n:'Pan blanco (1 tajada 25g)',cat:'🍚 Cereales',g:'cereal',p:2,c:13,f:1,k:69,u:'25g · 1 tajada blanda'},
+{n:'Pan blanco (2 tajadas 50g)',cat:'🍚 Cereales',g:'cereal',p:4,c:26,f:2,k:138,u:'50g · 2 tajadas · para sándwich'},
+{n:'Arepa maíz blanco pequeña (30g)',cat:'🍚 Cereales',g:'cereal',p:1,c:10,f:0,k:48,u:'30g · 1 arepita pequeña asada'},
+{n:'Arepa maíz blanco mediana (60g)',cat:'🍚 Cereales',g:'cereal',p:2,c:20,f:1,k:97,u:'60g · 1 arepa mediana asada'},
+{n:'Arepa de chócolo mediana (80g)',cat:'🍚 Cereales',g:'cereal',p:4,c:22,f:3,k:131,u:'80g · 1 und mediana · dulce'},
+{n:'Galleta Saltinas (1 tabla 8g)',cat:'🍚 Cereales',g:'cereal',p:1,c:6,f:1,k:37,u:'8g · 1 tabla'},
+{n:'Galleta Saltinas (2 tablas 16g)',cat:'🍚 Cereales',g:'cereal',p:2,c:12,f:2,k:74,u:'16g · 2 tablas · porción plan'},
+{n:'Galleta de arroz (1 und 8g)',cat:'🍚 Cereales',g:'cereal',p:1,c:7,f:0,k:30,u:'8g · 1 unidad redonda sin sal'},
+{n:'Galleta de arroz (2 und 16g)',cat:'🍚 Cereales',g:'cereal',p:1,c:14,f:0,k:60,u:'16g · 2 unidades'},
+{n:'Galleta de arroz (3 und 24g)',cat:'🍚 Cereales',g:'cereal',p:2,c:21,f:0,k:90,u:'24g · 3 unidades'},
+{n:'Pandebono pequeño (30g)',cat:'🍚 Cereales',g:'cereal',p:2,c:11,f:3,k:79,u:'30g · 1 und pequeño'},
+{n:'Pandebono mediano (50g)',cat:'🍚 Cereales',g:'cereal',p:4,c:18,f:6,k:142,u:'50g · 1 und mediano con queso'},
+{n:'Pandeyuca (2 und 40g)',cat:'🍚 Cereales',g:'cereal',p:2,c:24,f:2,k:122,u:'40g · 2 unidades pequeñas'},
+{n:'Almojábana (1 und 50g)',cat:'🍚 Cereales',g:'cereal',p:5,c:18,f:6,k:146,u:'50g · 1 unidad mediana'},
+{n:'Pasta cocida (½ pocillo 50g)',cat:'🍚 Cereales',g:'cereal',p:3,c:18,f:1,k:93,u:'50g · ½ pocillo'},
+{n:'Pasta cocida (1 pocillo 100g)',cat:'🍚 Cereales',g:'cereal',p:5,c:35,f:1,k:171,u:'100g · 1 pocillo'},
+{n:'Wrap tortilla trigo (1 und 45g)',cat:'🍚 Cereales',g:'cereal',p:4,c:26,f:4,k:156,u:'45g · 1 tortilla grande 25cm'},
+{n:'Maíz tierno / chócolo (½ mazorca)',cat:'🍚 Cereales',g:'cereal',p:3,c:17,f:1,k:89,u:'80g · ½ mazorca desgranada'},
 
-// — ALMENDRAS —
-{n:'Almendra Natural Nuthos (30g)',cat:'🥜 Maní y frutos secos',g:'grasa',p:6,c:7,f:15,k:190,u:'30g · 1 paquete Nuthos · Armenia/Colombia'},
-{n:'Almendras tostadas Taeq (30g)',cat:'🥜 Maní y frutos secos',g:'grasa',p:6,c:6,f:15,k:180,u:'30g · 1 paquete · Taeq Éxito'},
-{n:'Almendras (10 unidades)',cat:'🥜 Maní y frutos secos',g:'grasa',p:3,c:3,f:7,k:81,u:'~14g · 10 almendras'},
-{n:'Almendras (20 unidades)',cat:'🥜 Maní y frutos secos',g:'grasa',p:6,c:6,f:14,k:162,u:'~28g · 20 almendras'},
+// ════════════════════════════════════════════════════════
+// 🥔 TUBÉRCULOS — medias y porciones completas
+// ════════════════════════════════════════════════════════
+{n:'Papa pequeña (½ und 50g)',cat:'🥔 Tubérculos',g:'tuberculo',p:1,c:11,f:0,k:48,u:'50g · ½ papa pequeña cocida'},
+{n:'Papa mediana (1 und 100g)',cat:'🥔 Tubérculos',g:'tuberculo',p:2,c:22,f:0,k:96,u:'100g · 1 papa mediana cocida'},
+{n:'Papa criolla (3 und 80g)',cat:'🥔 Tubérculos',g:'tuberculo',p:2,c:18,f:0,k:80,u:'80g · 3 papas criollas'},
+{n:'Papa criolla (6 und 160g)',cat:'🥔 Tubérculos',g:'tuberculo',p:4,c:36,f:0,k:160,u:'160g · 6 papas criollas'},
+{n:'Plátano maduro (1/8 und 50g)',cat:'🥔 Tubérculos',g:'tuberculo',p:1,c:14,f:0,k:58,u:'50g · 1/8 plátano grande'},
+{n:'Plátano maduro (¼ und 100g)',cat:'🥔 Tubérculos',g:'tuberculo',p:1,c:28,f:0,k:116,u:'100g · ¼ plátano grande'},
+{n:'Plátano maduro asado (½ und)',cat:'🥔 Tubérculos',g:'tuberculo',p:1,c:28,f:0,k:116,u:'100g · ½ plátano asado'},
+{n:'Plátano verde cocido (½ taza)',cat:'🥔 Tubérculos',g:'tuberculo',p:1,c:26,f:0,k:109,u:'100g · ½ plátano verde'},
+{n:'Plátano verde (¼ crudo 52g)',cat:'🥔 Tubérculos',g:'tuberculo',p:1,c:14,f:0,k:60,u:'52g · ¼ plátano crudo'},
+{n:'Yuca cocida (1 trozo 80g)',cat:'🥔 Tubérculos',g:'tuberculo',p:1,c:24,f:0,k:100,u:'80g · 1 trozo mediano'},
+{n:'Yuca cocida (2 trozos 160g)',cat:'🥔 Tubérculos',g:'tuberculo',p:2,c:48,f:0,k:200,u:'160g · 2 trozos'},
+{n:'Arracacha cocida (80g)',cat:'🥔 Tubérculos',g:'tuberculo',p:1,c:18,f:0,k:76,u:'80g · 1 trozo'},
 
-// — NUECES —
-{n:'Nueces del nogal (4-5 mitades)',cat:'🥜 Maní y frutos secos',g:'grasa',p:2,c:2,f:9,k:93,u:'~13g · 4-5 mitades · omega-3'},
-{n:'Nueces del nogal (30g)',cat:'🥜 Maní y frutos secos',g:'grasa',p:4,c:4,f:18,k:196,u:'30g · puñado · TOSH o genérico'},
+// ════════════════════════════════════════════════════════
+// 🫘 LEGUMINOSAS
+// ════════════════════════════════════════════════════════
+{n:'Fríjoles con guiso (½ cucharón)',cat:'🫘 Leguminosas',g:'leguminosa',p:5,c:18,f:1,k:101,u:'~90g · ½ cucharón'},
+{n:'Fríjoles con guiso (1 cucharón)',cat:'🫘 Leguminosas',g:'leguminosa',p:9,c:36,f:2,k:202,u:'~180g · 1 cucharón'},
+{n:'Lentejas cocidas (½ taza 100g)',cat:'🫘 Leguminosas',g:'leguminosa',p:9,c:20,f:1,k:125,u:'100g · ½ taza'},
+{n:'Lentejas cocidas (1 taza 200g)',cat:'🫘 Leguminosas',g:'leguminosa',p:18,c:40,f:2,k:250,u:'200g · 1 taza'},
+{n:'Garbanzo cocido (½ taza 80g)',cat:'🫘 Leguminosas',g:'leguminosa',p:6,c:18,f:2,k:116,u:'80g · ½ taza'},
+{n:'Arveja verde (3 cdas 50g)',cat:'🫘 Leguminosas',g:'leguminosa',p:4,c:11,f:0,k:60,u:'50g · 3 cucharadas'},
 
-// — MARAÑONES / CAJÚ —
-{n:'Marañones tostados (30g)',cat:'🥜 Maní y frutos secos',g:'grasa',p:5,c:9,f:12,k:163,u:'30g · ~18 unidades'},
+// ════════════════════════════════════════════════════════
+// 🍊 FRUTAS
+// ════════════════════════════════════════════════════════
+{n:'Banano (1 und mediano 95g)',cat:'🍊 Frutas',g:'fruta',p:1,c:23,f:0,k:96,u:'95g sin cascara · 1 unidad'},
+{n:'Banano (½ und)',cat:'🍊 Frutas',g:'fruta',p:1,c:12,f:0,k:48,u:'~50g · ½ banano'},
+{n:'Manzana (1 und mediana 130g)',cat:'🍊 Frutas',g:'fruta',p:0,c:19,f:0,k:77,u:'130g con cascara'},
+{n:'Manzana (½ und)',cat:'🍊 Frutas',g:'fruta',p:0,c:10,f:0,k:38,u:'65g · ½ manzana'},
+{n:'Fresas (1 taza 150g)',cat:'🍊 Frutas',g:'fruta',p:2,c:14,f:0,k:64,u:'150g · ~10 fresas grandes'},
+{n:'Fresas (½ taza 75g)',cat:'🍊 Frutas',g:'fruta',p:1,c:7,f:0,k:32,u:'75g · ~5 fresas'},
+{n:'Granadilla (1 und 100g)',cat:'🍊 Frutas',g:'fruta',p:2,c:15,f:0,k:68,u:'100g sin cascara · 1 unidad'},
+{n:'Naranja (1 und mediana 150g)',cat:'🍊 Frutas',g:'fruta',p:1,c:17,f:0,k:72,u:'150g pelada'},
+{n:'Mandarina (2 und)',cat:'🍊 Frutas',g:'fruta',p:1,c:18,f:0,k:72,u:'~130g · 2 mandarinas peladas'},
+{n:'Papaya (1 tajada 150g)',cat:'🍊 Frutas',g:'fruta',p:1,c:17,f:0,k:72,u:'150g · 1 tajada media'},
+{n:'Mango (½ und 100g)',cat:'🍊 Frutas',g:'fruta',p:1,c:15,f:0,k:64,u:'100g · ½ mango pelado'},
+{n:'Guayaba (1 und 100g)',cat:'🍊 Frutas',g:'fruta',p:2,c:14,f:1,k:73,u:'100g · 1 guayaba mediana'},
+{n:'Piña (2 tajadas 100g)',cat:'🍊 Frutas',g:'fruta',p:0,c:13,f:0,k:52,u:'100g · 2 tajadas gruesas'},
+{n:'Uchuvas (1 pocillo 80g)',cat:'🍊 Frutas',g:'fruta',p:2,c:12,f:1,k:65,u:'80g · 1 pocillo · ~25 und'},
+{n:'Mora (1 pocillo 100g)',cat:'🍊 Frutas',g:'fruta',p:1,c:10,f:1,k:53,u:'100g · 1 pocillo'},
+{n:'Lulo (2 und 150g)',cat:'🍊 Frutas',g:'fruta',p:1,c:12,f:0,k:52,u:'150g · 2 lulos medianos'},
+{n:'Maracuyá (1 und pulpa 60g)',cat:'🍊 Frutas',g:'fruta',p:2,c:12,f:0,k:56,u:'60g pulpa · sin cáscara'},
+{n:'Tomate de árbol (1 und 80g)',cat:'🍊 Frutas',g:'fruta',p:1,c:8,f:0,k:36,u:'80g pelado · 1 unidad'},
 
-// — MANTEQUILLAS —
-{n:'Mantequilla de maní TOSH (1 cda)',cat:'🥜 Maní y frutos secos',g:'grasa',p:4,c:3,f:8,k:95,u:'15g · 1 cda · 100% maní sin azúcar'},
-{n:'Mantequilla de maní TOSH (2 cdas)',cat:'🥜 Maní y frutos secos',g:'grasa',p:8,c:6,f:16,k:190,u:'30g · 2 cdas · 100% maní sin azúcar'},
+// ════════════════════════════════════════════════════════
+// 🥦 VERDURAS
+// ════════════════════════════════════════════════════════
+{n:'Espinaca fresca (libre)',cat:'🥦 Verduras',g:'verdura',p:2,c:2,f:0,k:16,u:'1 pocillo · sin restricción'},
+{n:'Lechuga (libre)',cat:'🥦 Verduras',g:'verdura',p:1,c:2,f:0,k:12,u:'libre · sin restricción'},
+{n:'Tomate chonto (1 und 120g)',cat:'🥦 Verduras',g:'verdura',p:1,c:4,f:0,k:20,u:'120g · 1 tomate mediano'},
+{n:'Tomate cherry (1 pocillo 100g)',cat:'🥦 Verduras',g:'verdura',p:1,c:4,f:0,k:20,u:'100g · ~12 und'},
+{n:'Champiñones frescos (½ pocillo 85g)',cat:'🥦 Verduras',g:'verdura',p:3,c:3,f:0,k:22,u:'85g · ½ pocillo laminados'},
+{n:'Champiñones salteados (100g)',cat:'🥦 Verduras',g:'verdura',p:3,c:4,f:5,k:73,u:'100g + 5ml aceite · salteados'},
+{n:'Espinaca salteada (60g + aceite)',cat:'🥦 Verduras',g:'verdura',p:3,c:3,f:5,k:69,u:'60g espinaca + 5ml aceite oliva'},
+{n:'Brócoli al vapor (1 pocillo 100g)',cat:'🥦 Verduras',g:'verdura',p:3,c:6,f:0,k:37,u:'100g · 1 pocillo cocido'},
+{n:'Zanahoria cruda (1 und 60g)',cat:'🥦 Verduras',g:'verdura',p:1,c:6,f:0,k:28,u:'60g · 1 zanahoria mediana'},
+{n:'Pepino cohombro (libre)',cat:'🥦 Verduras',g:'verdura',p:0,c:2,f:0,k:10,u:'libre · muy bajo en calorías'},
+{n:'Pimentón (1 und mediano 120g)',cat:'🥦 Verduras',g:'verdura',p:1,c:7,f:0,k:31,u:'120g · 1 pimentón'},
+{n:'Auyama cocida (1 trozo 80g)',cat:'🥦 Verduras',g:'verdura',p:1,c:6,f:0,k:28,u:'80g · 1 trozo mediano'},
+{n:'Ensalada mixta (plato)',cat:'🥦 Verduras',g:'verdura',p:2,c:6,f:1,k:41,u:'lechuga + tomate + zanahoria + pepino'},
+{n:'Ensalada con vinagreta',cat:'🥦 Verduras',g:'verdura',p:2,c:7,f:6,k:90,u:'ensalada mixta + 5ml aceite oliva + limón'},
 
-// — COMBINACIONES PRÁCTICAS —
-{n:'Maní La Especial + banano',cat:'🥜 Maní y frutos secos',g:'grasa',p:8,c:21,f:16,k:268,u:'30g maní + 1 banano · refrigerio completo'},
-{n:'Almendras + manzana',cat:'🥜 Maní y frutos secos',g:'grasa',p:4,c:18,f:7,k:147,u:'14g almendras (10 und) + 1 manzana'},
-{n:'Nueces + yogurt griego',cat:'🥜 Maní y frutos secos',g:'grasa',p:10,c:7,f:11,k:163,u:'13g nueces + 100g yogurt griego'},
+// ════════════════════════════════════════════════════════
+// 🥑 GRASAS BUENAS
+// ════════════════════════════════════════════════════════
+{n:'Aguacate Hass (¼ und 40g)',cat:'🥑 Grasas',g:'grasa',p:1,c:3,f:7,k:77,u:'40g · 4 cucharadas · ¼ aguacate'},
+{n:'Aguacate Hass (½ und 80g)',cat:'🥑 Grasas',g:'grasa',p:2,c:6,f:14,k:154,u:'80g · ½ aguacate'},
+{n:'Aceite de oliva (1 cdita 5ml)',cat:'🥑 Grasas',g:'grasa',p:0,c:0,f:5,k:40,u:'5ml · 1 cucharadita · para cocinar'},
+{n:'Aceite de oliva (1 cda 10ml)',cat:'🥑 Grasas',g:'grasa',p:0,c:0,f:10,k:80,u:'10ml · 1 cucharada sopera'},
+{n:'Aceitunas (6 und 20g)',cat:'🥑 Grasas',g:'grasa',p:0,c:1,f:3,k:29,u:'20g · 6 aceitunas medianas'},
+{n:'Aceitunas (12 und 40g)',cat:'🥑 Grasas',g:'grasa',p:0,c:2,f:5,k:57,u:'40g · 12 aceitunas'},
+{n:'Mantequilla Rama (1 cdita 5g)',cat:'🥑 Grasas',g:'grasa',p:0,c:0,f:4,k:35,u:'5g · 1 cdita · para untar'},
 
-// ── AVENA EN PREPARACIONES ──
-{n:'Avena cocinada sola (agua)',cat:'🌾 Avena',g:'cereal',p:3,c:18,f:2,k:97,u:'30g avena + 200ml agua · 5 min fuego medio'},
-{n:'Avena cocinada con leche entera',cat:'🌾 Avena',g:'cereal',p:8,c:26,f:6,k:189,u:'30g avena + 200ml leche · cremosa'},
-{n:'Avena cocinada con leche descremada',cat:'🌾 Avena',g:'cereal',p:7,c:24,f:3,k:150,u:'30g avena + 200ml leche descremada'},
-{n:'Avena con leche y banano',cat:'🌾 Avena',g:'cereal',p:8,c:42,f:4,k:232,u:'30g avena + 150ml leche + 1 banano'},
-{n:'Avena con leche y manzana rallada',cat:'🌾 Avena',g:'cereal',p:7,c:36,f:3,k:195,u:'30g avena + 150ml leche + ½ manzana rallada'},
-{n:'Avena con leche y fresas',cat:'🌾 Avena',g:'cereal',p:7,c:30,f:3,k:175,u:'30g avena + 150ml leche + 80g fresas'},
-{n:'Avena con leche y canela (sin azúcar)',cat:'🌾 Avena',g:'cereal',p:7,c:24,f:3,k:150,u:'30g avena + 200ml leche + canela al gusto'},
-{n:'Avena con leche y miel',cat:'🌾 Avena',g:'cereal',p:7,c:32,f:3,k:183,u:'30g avena + 150ml leche + 1 cdita miel'},
-{n:'Avena con queso campesino (salada)',cat:'🌾 Avena',g:'cereal',p:10,c:20,f:7,k:181,u:'30g avena + agua + 30g queso campesino encima · estilo mazamorra'},
-{n:'Overnight oats básico',cat:'🌾 Avena',g:'cereal',p:10,c:30,f:5,k:205,u:'30g avena + 100g yogurt griego + 100ml leche · nevera toda la noche'},
-{n:'Overnight oats con banano',cat:'🌾 Avena',g:'cereal',p:10,c:46,f:5,k:269,u:'30g avena + 100g yogurt + 100ml leche + 1 banano · nevera'},
-{n:'Overnight oats con fresas y miel',cat:'🌾 Avena',g:'cereal',p:10,c:38,f:4,k:228,u:'30g avena + 100g yogurt + 80g fresas + 1 cdita miel'},
-{n:'Overnight oats con maní',cat:'🌾 Avena',g:'cereal',p:12,c:33,f:12,k:284,u:'30g avena + 100g yogurt + 100ml leche + 1 cda mantequilla maní'},
-{n:'Bebida de avena con canela',cat:'🌾 Avena',g:'cereal',p:5,c:22,f:3,k:135,u:'30g avena + 250ml leche fría + canela · licuado 30s'},
-{n:'Bebida de avena con miel y canela',cat:'🌾 Avena',g:'cereal',p:5,c:30,f:3,k:163,u:'30g avena + 250ml leche + 1 cdita miel · licuado'},
-{n:'Avena con maní y banano',cat:'🌾 Avena',g:'cereal',p:10,c:42,f:11,k:305,u:'30g avena + 150ml leche + ½ banano + 1 cda maní · desayuno completo'},
+// ════════════════════════════════════════════════════════
+// 💧 BEBIDAS
+// ════════════════════════════════════════════════════════
+{n:'Café negro sin azúcar',cat:'💧 Bebidas',g:'bebida',p:0,c:0,f:0,k:2,u:'240ml · negro'},
+{n:'Café con 1 cdita azúcar',cat:'💧 Bebidas',g:'bebida',p:0,c:4,f:0,k:18,u:'240ml + 4g azúcar'},
+{n:'Café con leche (½ + ½)',cat:'💧 Bebidas',g:'bebida',p:4,c:7,f:4,k:79,u:'120ml café + 120ml leche entera'},
+{n:'Aromática sin azúcar',cat:'💧 Bebidas',g:'bebida',p:0,c:0,f:0,k:2,u:'240ml · sin azúcar'},
+{n:'Agua de panela (1 taza)',cat:'💧 Bebidas',g:'bebida',p:0,c:12,f:0,k:48,u:'240ml · poca panela'},
+{n:'Jugo de fruta natural sin azúcar',cat:'💧 Bebidas',g:'bebida',p:1,c:12,f:0,k:52,u:'250ml · 1 vaso'},
+{n:'Coca Cola Zero / Pepsi Zero',cat:'💧 Bebidas',g:'bebida',p:0,c:0,f:0,k:1,u:'355ml · 1 lata · sin azúcar'},
+{n:'Caldo de pollo casero (1 taza)',cat:'💧 Bebidas',g:'bebida',p:4,c:1,f:1,k:29,u:'240ml · sin fideos'},
 
-// ── CARBOHIDRATOS PREPARADOS ──
-{n:'Pancakes de avena (3 und)',cat:'🥞 Preparados dulces',g:'cereal',p:14,c:34,f:8,k:266,u:'2 huevos + 30g avena + 1 cdita polvo hornear · sartén antiadherente'},
-{n:'Pancakes de avena con miel',cat:'🥞 Preparados dulces',g:'cereal',p:14,c:46,f:8,k:312,u:'pancakes de avena + 1 cda miel encima'},
-{n:'Pancakes de avena con banano',cat:'🥞 Preparados dulces',g:'cereal',p:14,c:50,f:8,k:328,u:'pancakes de avena + 1 banano en rodajas'},
-{n:'Pancakes de avena con fresas',cat:'🥞 Preparados dulces',g:'cereal',p:14,c:40,f:8,k:288,u:'pancakes de avena + 80g fresas + 1 cdita miel'},
-{n:'Pancakes con arequipe (2 und)',cat:'🥞 Preparados dulces',g:'cereal',p:9,c:42,f:7,k:267,u:'2 pancakes de avena + 1 cda arequipe · ocasional'},
-{n:'Tostada francesa (2 tajadas)',cat:'🥞 Preparados dulces',g:'cereal',p:12,c:28,f:9,k:241,u:'2 taj pan blanco + 1 huevo + leche + canela · sartén 2 min c/lado'},
-{n:'Tostada francesa con miel',cat:'🥞 Preparados dulces',g:'cereal',p:12,c:36,f:9,k:269,u:'tostada francesa + 1 cda miel'},
-{n:'Tostada francesa con banano y miel',cat:'🥞 Preparados dulces',g:'cereal',p:12,c:50,f:9,k:333,u:'tostada francesa + 1 banano + 1 cda miel'},
-{n:'Tostada francesa con arequipe',cat:'🥞 Preparados dulces',g:'cereal',p:12,c:40,f:9,k:289,u:'tostada francesa + 1 cda arequipe · colombiana clásica'},
-{n:'Tostadas con aguacate y huevo',cat:'🥞 Preparados dulces',g:'mixto',p:14,c:28,f:16,k:308,u:'2 taj pan tostado + ¼ aguacate + 1 huevo · salada'},
-{n:'Arepa con huevo y hogao',cat:'🥞 Preparados dulces',g:'mixto',p:12,c:20,f:9,k:213,u:'1 arepa + 1 huevo + hogao de tomate y cebolla'},
-{n:'Tostadas con mantequilla de maní y banano',cat:'🥞 Preparados dulces',g:'cereal',p:10,c:42,f:11,k:303,u:'2 taj pan tostado + 1 cda maní + ½ banano · desayuno express'},
-{n:'Panquecas con mermelada (2 und)',cat:'🥞 Preparados dulces',g:'cereal',p:8,c:44,f:6,k:258,u:'2 panquecas de harina + 1 cda mermelada · más sencillas'},
-{n:'Waffle casero con fruta',cat:'🥞 Preparados dulces',g:'cereal',p:9,c:36,f:7,k:243,u:'1 waffle mediano + 80g fruta · con wafflera'},
-{n:'Mazamorra con leche y panela',cat:'🥞 Preparados dulces',g:'cereal',p:5,c:32,f:3,k:175,u:'1 pocillo maíz cocido + leche + pizca panela · clásica paisa'},
-{n:'Colada de maíz con leche',cat:'🥞 Preparados dulces',g:'cereal',p:4,c:28,f:3,k:155,u:'30g maicena + 200ml leche + canela + panela · espesa'},
-{n:'Chorizo parrilla',cat:'🍖 Embutidos',g:'proteina',p:8,c:1,f:16,k:181,u:'50g · 1 und mediano'},
-{n:'Albóndigas de res (5 und pequeñas)',cat:'🍱 Preparaciones',g:'proteina',p:18,c:4,f:10,k:178,u:'~120g · 5 und pequeñas'},
-{n:'Arepa de yuca con queso y mantequilla',cat:'🍱 Preparaciones',g:'mixto',p:5,c:22,f:8,k:177,u:'1 arepa + 30g queso + 1 cdita mantequilla'},
-{n:'Salami (3 tajadas)',cat:'🍖 Embutidos',g:'proteina',p:7,c:1,f:10,k:122,u:'~45g · 3 tajadas'},
-{n:'Papa común (½ pequeña)',cat:'🥔 Tubérculos',g:'tuberculo',p:1,c:8,f:0,k:36,u:'35g · ½ papa pequeña'},
-{n:'Morcilla',cat:'🍖 Embutidos',g:'mixto',p:5,c:8,f:12,k:164,u:'50g · 1 und'},
+// ════════════════════════════════════════════════════════
+// 🍯 EXTRAS
+// ════════════════════════════════════════════════════════
+{n:'Miel de abejas (1 cdita 10g)',cat:'🍯 Extras',g:'extra',p:0,c:9,f:0,k:36,u:'10g · 1 cucharadita'},
+{n:'Miel de abejas (1 cda 20g)',cat:'🍯 Extras',g:'extra',p:0,c:18,f:0,k:72,u:'20g · 1 cucharada'},
+{n:'Arequipe (1 cdita 15g)',cat:'🍯 Extras',g:'extra',p:2,c:12,f:2,k:74,u:'15g · 1 cdita · ocasional'},
+{n:'Panela en polvo (1 cdita 5g)',cat:'🍯 Extras',g:'extra',p:0,c:5,f:0,k:20,u:'5g · 1 cucharadita'},
+{n:'Panela en polvo (1 cda 13g)',cat:'🍯 Extras',g:'extra',p:0,c:13,f:0,k:52,u:'13g · 1 cda sopera'},
+{n:'Mermelada (1 cda 20g)',cat:'🍯 Extras',g:'extra',p:0,c:13,f:0,k:52,u:'20g · 1 cucharada'},
+{n:'Mostaza (1 cda)',cat:'🍯 Extras',g:'extra',p:0,c:1,f:0,k:9,u:'15g · libre casi'},
+{n:'Gelatina sin azúcar (1 taza)',cat:'🍯 Extras',g:'extra',p:2,c:0,f:0,k:8,u:'libre · colágeno'},
+{n:'Achiras del Huila (5 palitos 30g)',cat:'🍯 Extras',g:'extra',p:2,c:17,f:6,k:128,u:'30g · 5 palitos · etiqueta real'},
+
+// ════════════════════════════════════════════════════════
+// 🍱 PREPARACIONES COMPLETAS
+// ════════════════════════════════════════════════════════
+{n:'Arroz con pollo (1 plato)',cat:'🍱 Preparaciones',g:'mixto',p:22,c:30,f:5,k:253,u:'100g arroz + 80g pollo · casero'},
+{n:'Fríjoles con arroz (1 plato)',cat:'🍱 Preparaciones',g:'mixto',p:12,c:50,f:2,k:266,u:'½ taza fríjoles + 4 cdas arroz'},
+{n:'Pasta con atún y tomate (1 plato)',cat:'🍱 Preparaciones',g:'mixto',p:30,c:38,f:4,k:308,u:'100g pasta + 1 lata atún + salsa'},
+{n:'Ensalada de atún completa',cat:'🍱 Preparaciones',g:'mixto',p:28,c:5,f:4,k:168,u:'170g atún + lechuga + tomate + vinagreta'},
+{n:'Sopa de verduras con pollo (1 taza)',cat:'🍱 Preparaciones',g:'mixto',p:12,c:12,f:2,k:116,u:'250ml · 1 taza · casera'},
+{n:'Calentado antioqueño liviano',cat:'🍱 Preparaciones',g:'mixto',p:14,c:32,f:5,k:229,u:'½ taza fríjol + ½ taza arroz + 1 huevo'},
+{n:'Hamburguesa casera (sin papas)',cat:'🍱 Preparaciones',g:'mixto',p:20,c:25,f:15,k:315,u:'100g carne + pan + queso'},
+{n:'Empanada al horno (1 und 80g)',cat:'🍱 Preparaciones',g:'mixto',p:8,c:19,f:5,k:153,u:'80g · 1 empanada horneada'},
+{n:'Albóndigas de res (5 und pequeñas)',cat:'🍱 Preparaciones',g:'proteina',p:18,c:4,f:10,k:178,u:'~120g · 5 albóndigas pequeñas'},
+{n:'Arepa yuca + queso + mantequilla',cat:'🍱 Preparaciones',g:'mixto',p:5,c:22,f:8,k:177,u:'1 arepa + 30g queso + 1 cdita mantequilla'},
+
+// ════════════════════════════════════════════════════════
+// 🥙 CENAS RÁPIDAS
+// ════════════════════════════════════════════════════════
+{n:'Sándwich jamón Pietran + mozzarella',cat:'🥙 Cenas rápidas',g:'mixto',p:20,c:32,f:13,k:325,u:'2 taj pan integral + 2 taj jamón + 2 taj mozzarella'},
+{n:'Sándwich jamón Pietran + queso + aguacate',cat:'🥙 Cenas rápidas',g:'mixto',p:21,c:35,f:20,k:400,u:'2 taj pan + 2 taj jamón + 2 taj queso + ¼ aguacate'},
+{n:'Sándwich atún y aguacate',cat:'🥙 Cenas rápidas',g:'mixto',p:32,c:28,f:9,k:325,u:'2 taj pan + ½ lata atún + ¼ aguacate'},
+{n:'Sándwich pavo Pietran y aguacate',cat:'🥙 Cenas rápidas',g:'mixto',p:22,c:32,f:15,k:347,u:'2 taj pan + 3 taj pavo Pietran + 1 taj queso + ¼ aguacate'},
+{n:'Huevo + queso + pan (cena)',cat:'🥙 Cenas rápidas',g:'mixto',p:20,c:18,f:20,k:328,u:'2 huevos cacerola + 30g queso + 1 taj pan'},
+{n:'Wrap jamón y queso frío',cat:'🥙 Cenas rápidas',g:'mixto',p:22,c:30,f:12,k:320,u:'1 tortilla + 2 taj jamón + 1 taj queso + espinaca'},
+{n:'Quesadilla rápida',cat:'🥙 Cenas rápidas',g:'mixto',p:18,c:28,f:14,k:310,u:'1 tortilla + 50g mozzarella + 2 taj jamón · sartén 3 min'},
+{n:'Mini tabla nocturna',cat:'🥙 Cenas rápidas',g:'mixto',p:19,c:14,f:13,k:251,u:'3 taj jamón + 2 taj queso + 6 aceitunas + 2 galletas arroz'},
+
+// ════════════════════════════════════════════════════════
+// 🌾 AVENA EN PREPARACIONES
+// ════════════════════════════════════════════════════════
+{n:'Avena cocinada con agua',cat:'🌾 Avena',g:'cereal',p:4,c:20,f:2,k:110,u:'30g avena + 200ml agua · 5 min revolviendo'},
+{n:'Avena cocinada con leche entera',cat:'🌾 Avena',g:'cereal',p:10,c:29,f:7,k:219,u:'30g avena + 200ml leche · cremosa'},
+{n:'Avena con leche y banano',cat:'🌾 Avena',g:'cereal',p:10,c:49,f:6,k:286,u:'30g avena + 150ml leche + 1 banano'},
+{n:'Avena con leche y fresas',cat:'🌾 Avena',g:'cereal',p:10,c:35,f:6,k:234,u:'30g avena + 150ml leche + 80g fresas'},
+{n:'Avena con leche y miel',cat:'🌾 Avena',g:'cereal',p:10,c:37,f:6,k:242,u:'30g avena + 150ml leche + 1 cdita miel'},
+{n:'Avena cocinada con queso (salada)',cat:'🌾 Avena',g:'cereal',p:13,c:22,f:8,k:212,u:'30g avena + agua + 30g queso campesino encima'},
+{n:'Avena con maní y canela',cat:'🌾 Avena',g:'cereal',p:11,c:26,f:12,k:252,u:'30g avena + 150ml leche + 1 cda maní + canela'},
+{n:'Overnight oats básico',cat:'🌾 Avena',g:'cereal',p:14,c:33,f:5,k:233,u:'30g avena + 100g yogurt griego + 100ml leche · nevera toda la noche'},
+{n:'Overnight oats con banano y miel',cat:'🌾 Avena',g:'cereal',p:14,c:52,f:5,k:301,u:'30g avena + 100g yogurt + 100ml leche + 1 banano + 1 cdita miel'},
+{n:'Overnight oats con fresas',cat:'🌾 Avena',g:'cereal',p:14,c:41,f:4,k:252,u:'30g avena + 100g yogurt + 80g fresas + 1 cdita miel'},
+{n:'Overnight oats con maní',cat:'🌾 Avena',g:'cereal',p:16,c:36,f:13,k:317,u:'30g avena + 100g yogurt + 100ml leche + 1 cda maní'},
+{n:'Bebida de avena con leche y canela',cat:'🌾 Avena',g:'cereal',p:10,c:29,f:6,k:210,u:'30g avena + 250ml leche + canela · licuado 30 seg'},
+
+// ════════════════════════════════════════════════════════
+// 🥞 PREPARADOS DULCES
+// ════════════════════════════════════════════════════════
+{n:'Pancakes de avena (2 und)',cat:'🥞 Preparados dulces',g:'cereal',p:16,c:26,f:10,k:258,u:'30g avena + 2 huevos + 1 cdita polvo hornear · sartén'},
+{n:'Pancakes de avena con miel',cat:'🥞 Preparados dulces',g:'cereal',p:16,c:44,f:10,k:330,u:'2 pancakes + 1 cda miel'},
+{n:'Pancakes de avena con banano',cat:'🥞 Preparados dulces',g:'cereal',p:16,c:50,f:10,k:354,u:'2 pancakes + 1 banano en rodajas + miel'},
+{n:'Pancakes de avena con fresas y miel',cat:'🥞 Preparados dulces',g:'cereal',p:16,c:40,f:10,k:314,u:'2 pancakes + 80g fresas + 1 cdita miel'},
+{n:'Tostada francesa (2 tajadas)',cat:'🥞 Preparados dulces',g:'cereal',p:12,c:28,f:9,k:241,u:'2 taj pan + 1 huevo + 30ml leche + canela · sartén 2 min c/lado'},
+{n:'Tostada francesa con miel',cat:'🥞 Preparados dulces',g:'cereal',p:12,c:44,f:9,k:305,u:'tostada francesa + 1 cda miel encima'},
+{n:'Tostada francesa con banano y miel',cat:'🥞 Preparados dulces',g:'cereal',p:12,c:58,f:9,k:369,u:'tostada francesa + 1 banano en rodajas + 1 cda miel'},
+{n:'Tostada francesa con arequipe',cat:'🥞 Preparados dulces',g:'cereal',p:14,c:42,f:9,k:305,u:'tostada francesa + 1 cdita arequipe · colombiana clásica'},
+{n:'Tostadas con maní y banano',cat:'🥞 Preparados dulces',g:'cereal',p:10,c:44,f:10,k:306,u:'2 taj pan tostado + 1 cda maní + 1 banano'},
+{n:'Mazamorra con leche y panela',cat:'🥞 Preparados dulces',g:'cereal',p:6,c:34,f:4,k:196,u:'1 pocillo maíz cocido + 200ml leche + pizca panela'},
+
+// ════════════════════════════════════════════════════════
+// 🥜 FRUTOS SECOS — marcas colombianas
+// ════════════════════════════════════════════════════════
+{n:'Maní tostado sin sal (30g)',cat:'🥜 Frutos secos',g:'grasa',p:7,c:5,f:15,k:170,u:'30g · puñado · sin sal · mejor opción'},
+{n:'Maní tostado sin sal (1 cda 15g)',cat:'🥜 Frutos secos',g:'grasa',p:4,c:3,f:8,k:95,u:'15g · 1 cda · snack mínimo'},
+{n:'Maní La Especial salado (30g)',cat:'🥜 Frutos secos',g:'grasa',p:7,c:5,f:16,k:200,u:'30g · 1 paquete · La Especial'},
+{n:'Maní La Especial limón pimienta (30g)',cat:'🥜 Frutos secos',g:'grasa',p:7,c:6,f:15,k:189,u:'30g · 1 paquete'},
+{n:'Mezcla nueces+maní+almendras La Especial (30g)',cat:'🥜 Frutos secos',g:'grasa',p:7,c:5,f:16,k:200,u:'30g · 2 cdas · etiqueta real'},
+{n:'Almendras Nuthos (30g)',cat:'🥜 Frutos secos',g:'grasa',p:6,c:7,f:15,k:190,u:'30g · 1 paquete Nuthos · ~20 almendras'},
+{n:'Almendras (10 und 14g)',cat:'🥜 Frutos secos',g:'grasa',p:3,c:3,f:7,k:81,u:'14g · 10 almendras'},
+{n:'Nueces del nogal (4-5 mitades 13g)',cat:'🥜 Frutos secos',g:'grasa',p:2,c:2,f:9,k:93,u:'13g · 4-5 mitades · alto en omega-3'},
+{n:'Nueces del nogal (30g)',cat:'🥜 Frutos secos',g:'grasa',p:4,c:4,f:18,k:196,u:'30g · puñado'},
+{n:'Mantequilla maní TOSH (1 cda)',cat:'🥜 Frutos secos',g:'grasa',p:4,c:3,f:8,k:95,u:'15g · 100% maní sin azúcar'},
+{n:'Mantequilla maní TOSH (2 cdas)',cat:'🥜 Frutos secos',g:'grasa',p:8,c:6,f:16,k:190,u:'30g · para untar o en avena'},
+{n:'Maní + banano (snack)',cat:'🥜 Frutos secos',g:'grasa',p:8,c:26,f:15,k:263,u:'30g maní + 1 banano · refrigerio completo'},
+{n:'Almendras + manzana (snack)',cat:'🥜 Frutos secos',g:'grasa',p:3,c:22,f:7,k:159,u:'14g almendras + 1 manzana'},
+
+// ════════════════════════════════════════════════════════
+// 💊 SUPLEMENTOS
+// ════════════════════════════════════════════════════════
+{n:'Prowhey Bariatric (dosis completa 51g)',cat:'💊 Suplementos',g:'proteina',p:35,c:8,f:2,k:194,u:'51g · 3 scoops · dosis diaria'},
+{n:'Prowhey Bariatric (1 scoop 17g)',cat:'💊 Suplementos',g:'proteina',p:12,c:3,f:1,k:65,u:'17g · 1 scoop'},
+{n:'Creatina (3g)',cat:'💊 Suplementos',g:'suplemento',p:0,c:0,f:0,k:0,u:'3g · en agua · sin calorías'},
+
 ];
 
 // ═══════════════════════════════════════════════
@@ -1192,10 +1199,16 @@ function doSearch() {
   if(!res.length){el.innerHTML='<div style="padding:10px;font-size:12px;color:var(--muted)">No encontrado — usa ingreso manual</div>';return}
   el.innerHTML=res.map(f=>`
     <div class="ritem" onclick='pickFood(${JSON.stringify(f).replace(/'/g,"&#39;")})'>
-      <div style="display:flex;justify-content:space-between;align-items:center">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px">
         <div class="rname">${f.n}</div><span class="rcat">${f.cat.replace(/^.+? /,'')}</span>
       </div>
-      <div class="rmeta">${f.u} · 💪${f.p}g · 🔥${f.k}kcal · 🌾${f.c}g · 🥑${f.f}g</div>
+      <div class="rmeta">
+        <span class="rmeta-u">${f.u}</span>
+        <span class="rmacro rmacro-p">💪 ${f.p}g P</span>
+        <span class="rmacro rmacro-k">🔥 ${f.k} kcal</span>
+        <span class="rmacro rmacro-c">🌾 ${f.c}g C</span>
+        <span class="rmacro rmacro-f">🥑 ${f.f}g G</span>
+      </div>
     </div>`).join('');
 }
 
@@ -1208,7 +1221,13 @@ function showCat(cat) {
   FOODS.filter(f=>f.cat===cat).map(f=>`
     <div class="ritem" onclick='pickFood(${JSON.stringify(f).replace(/'/g,"&#39;")})'>
       <div class="rname">${f.n}</div>
-      <div class="rmeta">${f.u} · 💪${f.p}g · 🔥${f.k}kcal · 🌾${f.c}g · 🥑${f.f}g</div>
+      <div class="rmeta">
+        <span class="rmeta-u">${f.u}</span>
+        <span class="rmacro rmacro-p">💪 ${f.p}g P</span>
+        <span class="rmacro rmacro-k">🔥 ${f.k} kcal</span>
+        <span class="rmacro rmacro-c">🌾 ${f.c}g C</span>
+        <span class="rmacro rmacro-f">🥑 ${f.f}g G</span>
+      </div>
     </div>`).join('');
 }
 
