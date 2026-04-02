@@ -509,20 +509,36 @@ async function loadFromSupabase() {
     sbGet(`/rest/v1/nl_water?user_key=eq.${USER}&select=date,glasses`),
     sbGet(`/rest/v1/nl_game?user_key=eq.${USER}&select=xp,unlocked_achs,last_date&limit=1`)
   ]);
-  if(days)  days.forEach(r=>{ DB.set('day_'+r.date,{meals:r.meals||{breakfast:[],morning:[],lunch:[],afternoon:[],dinner:[]}}); });
-  if(sups)  sups.forEach(r=>{ DB.set('sups_'+r.date, r.data||{}); });
-  if(water) water.forEach(r=>{ DB.set('water_'+r.date, r.glasses||0); });
+
+  if(days) days.forEach(r=>{
+    const localDay = DB.day(r.date);
+    const localHasData = Object.values(localDay.meals).some(e=>e.length>0);
+    // Solo sobreescribir si local está vacío para esa fecha
+    // Si local tiene datos (usuario ya ingresó algo), NO tocar
+    if(!localHasData) {
+      DB.set('day_'+r.date, {meals: r.meals||{breakfast:[],morning:[],lunch:[],afternoon:[],dinner:[]}});
+    }
+  });
+
+  if(sups) sups.forEach(r=>{
+    const localSups = DB.sups(r.date);
+    const localHasData = Object.keys(localSups).length > 0;
+    if(!localHasData) DB.set('sups_'+r.date, r.data||{});
+  });
+
+  if(water) water.forEach(r=>{
+    // Solo actualizar agua si local es 0
+    if(!DB.water(r.date)) DB.set('water_'+r.date, r.glasses||0);
+  });
+
   if(game&&game[0]) {
     const g=game[0];
-    // Solo actualizar si el XP de Supabase es mayor (evitar perder progreso)
     const localGame = DB.game();
-    const sbXP = g.xp||0;
-    const finalXP = Math.max(sbXP, localGame.xp||0);
-    // Merge de logros (tomar todos de ambos)
-    const sbAchs = g.unlocked_achs||[];
-    const localAchs = localGame.achs||[];
-    const mergedAchs = [...new Set([...sbAchs,...localAchs])];
-    DB.set('game',{xp:finalXP, achs:mergedAchs, lastDate:g.last_date});
+    // Tomar el XP más alto entre local y Supabase
+    const finalXP = Math.max(g.xp||0, localGame.xp||0);
+    // Merge de logros
+    const mergedAchs = [...new Set([...(g.unlocked_achs||[]),...(localGame.achs||[])])];
+    DB.set('game',{xp:finalXP, achs:mergedAchs, lastDate:g.last_date||localGame.lastDate});
   }
 }
 
@@ -797,6 +813,119 @@ const FOODS=[
 {n:'Carne molida magra',cat:'🍗 Carnes',g:'proteina',p:18,c:0,f:10,k:162,u:'100g cocida'},
 {n:'Huevo en cacerola (1 und)',cat:'🍗 Carnes',g:'proteina',p:6,c:0,f:5,k:73,u:'50g · 1 und · con aceite'},
 {n:'Huevo en cacerola (2 und)',cat:'🍗 Carnes',g:'proteina',p:12,c:1,f:10,k:150,u:'100g · 2 und · con aceite'},
+
+// ── CENAS RÁPIDAS ──
+{n:'Sándwich jamón Pietran y mozzarella',cat:'🥙 Cenas rápidas',g:'mixto',p:28,c:37,f:14,k:404,u:'2 taj pan + 2 taj jamón + 2 taj queso'},
+{n:'Sándwich jamón Pietran + mozzarella + aguacate',cat:'🥙 Cenas rápidas',g:'mixto',p:29,c:40,f:21,k:481,u:'2 taj pan + 2 taj jamón + 2 taj queso + ¼ aguacate'},
+{n:'Tostadas con atún',cat:'🥙 Cenas rápidas',g:'mixto',p:34,c:30,f:6,k:310,u:'2 taj pan tostado + 1 lata atún + tomate'},
+{n:'Sándwich pavo y aguacate',cat:'🥙 Cenas rápidas',g:'mixto',p:26,c:35,f:16,k:390,u:'2 taj pan + 3 taj jamón pavo + 1 taj queso + ¼ aguacate'},
+{n:'Huevo con queso y pan',cat:'🥙 Cenas rápidas',g:'mixto',p:23,c:20,f:22,k:370,u:'2 huevos + 1 taj queso campesino + 1 taj pan + tomate'},
+{n:'Wrap jamón y queso',cat:'🥙 Cenas rápidas',g:'mixto',p:22,c:30,f:12,k:320,u:'1 tortilla + 2 taj jamón + 1 taj queso + espinaca + mostaza'},
+{n:'Quesadilla rápida',cat:'🥙 Cenas rápidas',g:'mixto',p:18,c:28,f:14,k:310,u:'1 tortilla + 2 taj queso + 1 taj jamón · sartén 3 min'},
+{n:'Mini tabla nocturna',cat:'🥙 Cenas rápidas',g:'mixto',p:20,c:14,f:14,k:270,u:'3 taj jamón + 2 taj queso + 6 aceitunas + 2 galletas arroz'},
+{n:'Jamón Pietran cerdo (2 tajadas)',cat:'🥙 Cenas rápidas',g:'sustituto',p:12,c:4,f:2,k:94,u:'41g · 2 tajadas · Pietran'},
+{n:'Jamón pavo Pietran (2 tajadas)',cat:'🥙 Cenas rápidas',g:'sustituto',p:8,c:3,f:0,k:44,u:'41g · 2 tajadas · más proteína, menos grasa'},
+
+// ── CARBOHIDRATOS COMPLETOS ──
+{n:'Avena cocinada con leche',cat:'🌾 Carbos completos',g:'cereal',p:8,c:28,f:4,k:180,u:'40g avena + 200ml leche descremada'},
+{n:'Avena overnight con banano',cat:'🌾 Carbos completos',g:'cereal',p:7,c:35,f:4,k:200,u:'30g avena + 150ml leche + ½ banano · sin cocinar'},
+{n:'Tostadas de pan integral con mantequilla de maní',cat:'🌾 Carbos completos',g:'cereal',p:8,c:30,f:9,k:237,u:'2 taj pan integral + 1 cda mantequilla maní'},
+{n:'Arroz con fríjoles (media taza c/u)',cat:'🌾 Carbos completos',g:'mixto',p:10,c:42,f:2,k:226,u:'½ taza arroz + ½ taza fríjoles cocidos'},
+{n:'Papa asada con queso',cat:'🌾 Carbos completos',g:'tuberculo',p:8,c:22,f:5,k:165,u:'1 papa mediana + 30g queso campesino'},
+{n:'Plátano asado con queso',cat:'🌾 Carbos completos',g:'tuberculo',p:6,c:28,f:4,k:172,u:'½ plátano maduro asado + 30g queso'},
+{n:'Yuca con hogao',cat:'🌾 Carbos completos',g:'tuberculo',p:2,c:30,f:3,k:155,u:'100g yuca cocida + hogao casero'},
+{n:'Mazorca desgranada con sal y limón',cat:'🌾 Carbos completos',g:'cereal',p:4,c:25,f:2,k:133,u:'1 mazorca mediana desgranada'},
+{n:'Pan integral con aguacate',cat:'🌾 Carbos completos',g:'cereal',p:4,c:28,f:8,k:196,u:'2 taj pan integral + ¼ aguacate'},
+{n:'Granola con yogurt griego',cat:'🌾 Carbos completos',g:'cereal',p:11,c:30,f:5,k:209,u:'30g granola + 100g yogurt griego'},
+{n:'Arepa con huevo y queso',cat:'🌾 Carbos completos',g:'mixto',p:16,c:18,f:12,k:244,u:'1 arepa mediana + 1 huevo + 30g queso'},
+{n:'Pasta con atún y tomate',cat:'🌾 Carbos completos',g:'mixto',p:28,c:38,f:4,k:300,u:'60g pasta cocida + 1 lata atún + salsa tomate'},
+{n:'Arroz integral con pollo',cat:'🌾 Carbos completos',g:'mixto',p:28,c:32,f:5,k:285,u:'½ taza arroz integral + 80g pechuga'},
+{n:'Tostada francesa (2 rebanadas)',cat:'🌾 Carbos completos',g:'cereal',p:12,c:28,f:8,k:232,u:'2 taj pan + 2 huevos batidos + canela · sartén'},
+{n:'Mazamorra con leche y panela',cat:'🌾 Carbos completos',g:'cereal',p:5,c:32,f:3,k:175,u:'1 pocillo mazamorra + leche + pizca panela'},
+{n:'Calentado antioqueño liviano',cat:'🌾 Carbos completos',g:'mixto',p:14,c:30,f:6,k:230,u:'½ taza fríjol + ½ taza arroz + 1 huevo'},
+
+// ── MERIENDAS CON CARBOS ──
+{n:'Banano con mantequilla de maní',cat:'🍎 Meriendas',g:'fruta',p:4,c:24,f:5,k:157,u:'1 banano + 1 cdita mantequilla maní'},
+{n:'Manzana con queso campesino',cat:'🍎 Meriendas',g:'fruta',p:6,c:16,f:4,k:120,u:'1 manzana + 30g queso'},
+{n:'Galletas de arroz con aguacate',cat:'🍎 Meriendas',g:'cereal',p:2,c:18,f:8,k:154,u:'3 galletas arroz + ¼ aguacate'},
+{n:'Yogurt griego con granola y fruta',cat:'🍎 Meriendas',g:'lacteo',p:12,c:28,f:4,k:196,u:'100g yogurt + 20g granola + ½ taza fruta'},
+{n:'Tostada con arequipe y queso',cat:'🍎 Meriendas',g:'cereal',p:5,c:22,f:5,k:153,u:'1 taj pan tostado + 1 cda arequipe + 30g queso'},
+{n:'Aguacate con galletas Saltinas',cat:'🍎 Meriendas',g:'grasa',p:3,c:18,f:10,k:174,u:'¼ aguacate + 2 tablas Saltinas'},
+
+// ── MANÍ Y FRUTOS SECOS — MARCAS COLOMBIANAS ──
+// Datos de etiquetas reales (Fitia Colombia / OpenFoodFacts)
+
+// — MANÍ —
+{n:'Maní La Especial salado (30g)',cat:'🥜 Maní y frutos secos',g:'grasa',p:7,c:5,f:16,k:200,u:'30g · 1 paquete · La Especial'},
+{n:'Maní La Especial salado (50g)',cat:'🥜 Maní y frutos secos',g:'grasa',p:12,c:8,f:27,k:333,u:'50g · paquete grande · La Especial'},
+{n:'Maní La Especial limón pimienta (30g)',cat:'🥜 Maní y frutos secos',g:'grasa',p:7,c:6,f:15,k:189,u:'30g · 1 paquete · La Especial'},
+{n:'Maní Kraks La Especial (30g)',cat:'🥜 Maní y frutos secos',g:'grasa',p:4,c:16,f:7,k:140,u:'30g · maní con cobertura crocante'},
+{n:'Maní con sal Sunshine/Maniyur (30g)',cat:'🥜 Maní y frutos secos',g:'grasa',p:7,c:5,f:15,k:190,u:'30g · ¼ taza'},
+{n:'Maní tostado sin sal (1 cda)',cat:'🥜 Maní y frutos secos',g:'grasa',p:4,c:3,f:8,k:95,u:'15g · 1 cucharada sopera'},
+{n:'Maní tostado sin sal (puñado 30g)',cat:'🥜 Maní y frutos secos',g:'grasa',p:7,c:5,f:15,k:170,u:'30g · puñado pequeño · sin sal ideal'},
+
+// — MEZCLAS —
+{n:'La Especial mezcla nueces+maní+almendras+marañones (30g)',cat:'🥜 Maní y frutos secos',g:'grasa',p:7,c:5,f:16,k:200,u:'30g · 2 cdas · La Especial'},
+{n:'La Especial mezcla maní+arándanos (40g)',cat:'🥜 Maní y frutos secos',g:'grasa',p:7,c:14,f:13,k:209,u:'40g · 1 sobre · La Especial'},
+{n:'La Especial mezcla 50g',cat:'🥜 Maní y frutos secos',g:'grasa',p:12,c:8,f:27,k:333,u:'50g · paquete mediano'},
+
+// — ALMENDRAS —
+{n:'Almendra Natural Nuthos (30g)',cat:'🥜 Maní y frutos secos',g:'grasa',p:6,c:7,f:15,k:190,u:'30g · 1 paquete Nuthos · Armenia/Colombia'},
+{n:'Almendras tostadas Taeq (30g)',cat:'🥜 Maní y frutos secos',g:'grasa',p:6,c:6,f:15,k:180,u:'30g · 1 paquete · Taeq Éxito'},
+{n:'Almendras (10 unidades)',cat:'🥜 Maní y frutos secos',g:'grasa',p:3,c:3,f:7,k:81,u:'~14g · 10 almendras'},
+{n:'Almendras (20 unidades)',cat:'🥜 Maní y frutos secos',g:'grasa',p:6,c:6,f:14,k:162,u:'~28g · 20 almendras'},
+
+// — NUECES —
+{n:'Nueces del nogal (4-5 mitades)',cat:'🥜 Maní y frutos secos',g:'grasa',p:2,c:2,f:9,k:93,u:'~13g · 4-5 mitades · omega-3'},
+{n:'Nueces del nogal (30g)',cat:'🥜 Maní y frutos secos',g:'grasa',p:4,c:4,f:18,k:196,u:'30g · puñado · TOSH o genérico'},
+
+// — MARAÑONES / CAJÚ —
+{n:'Marañones tostados (30g)',cat:'🥜 Maní y frutos secos',g:'grasa',p:5,c:9,f:12,k:163,u:'30g · ~18 unidades'},
+
+// — MANTEQUILLAS —
+{n:'Mantequilla de maní TOSH (1 cda)',cat:'🥜 Maní y frutos secos',g:'grasa',p:4,c:3,f:8,k:95,u:'15g · 1 cda · 100% maní sin azúcar'},
+{n:'Mantequilla de maní TOSH (2 cdas)',cat:'🥜 Maní y frutos secos',g:'grasa',p:8,c:6,f:16,k:190,u:'30g · 2 cdas · 100% maní sin azúcar'},
+
+// — COMBINACIONES PRÁCTICAS —
+{n:'Maní La Especial + banano',cat:'🥜 Maní y frutos secos',g:'grasa',p:8,c:21,f:16,k:268,u:'30g maní + 1 banano · refrigerio completo'},
+{n:'Almendras + manzana',cat:'🥜 Maní y frutos secos',g:'grasa',p:4,c:18,f:7,k:147,u:'14g almendras (10 und) + 1 manzana'},
+{n:'Nueces + yogurt griego',cat:'🥜 Maní y frutos secos',g:'grasa',p:10,c:7,f:11,k:163,u:'13g nueces + 100g yogurt griego'},
+
+// ── AVENA EN PREPARACIONES ──
+{n:'Avena cocinada sola (agua)',cat:'🌾 Avena',g:'cereal',p:3,c:18,f:2,k:97,u:'30g avena + 200ml agua · 5 min fuego medio'},
+{n:'Avena cocinada con leche entera',cat:'🌾 Avena',g:'cereal',p:8,c:26,f:6,k:189,u:'30g avena + 200ml leche · cremosa'},
+{n:'Avena cocinada con leche descremada',cat:'🌾 Avena',g:'cereal',p:7,c:24,f:3,k:150,u:'30g avena + 200ml leche descremada'},
+{n:'Avena con leche y banano',cat:'🌾 Avena',g:'cereal',p:8,c:42,f:4,k:232,u:'30g avena + 150ml leche + 1 banano'},
+{n:'Avena con leche y manzana rallada',cat:'🌾 Avena',g:'cereal',p:7,c:36,f:3,k:195,u:'30g avena + 150ml leche + ½ manzana rallada'},
+{n:'Avena con leche y fresas',cat:'🌾 Avena',g:'cereal',p:7,c:30,f:3,k:175,u:'30g avena + 150ml leche + 80g fresas'},
+{n:'Avena con leche y canela (sin azúcar)',cat:'🌾 Avena',g:'cereal',p:7,c:24,f:3,k:150,u:'30g avena + 200ml leche + canela al gusto'},
+{n:'Avena con leche y miel',cat:'🌾 Avena',g:'cereal',p:7,c:32,f:3,k:183,u:'30g avena + 150ml leche + 1 cdita miel'},
+{n:'Avena con queso campesino (salada)',cat:'🌾 Avena',g:'cereal',p:10,c:20,f:7,k:181,u:'30g avena + agua + 30g queso campesino encima · estilo mazamorra'},
+{n:'Overnight oats básico',cat:'🌾 Avena',g:'cereal',p:10,c:30,f:5,k:205,u:'30g avena + 100g yogurt griego + 100ml leche · nevera toda la noche'},
+{n:'Overnight oats con banano',cat:'🌾 Avena',g:'cereal',p:10,c:46,f:5,k:269,u:'30g avena + 100g yogurt + 100ml leche + 1 banano · nevera'},
+{n:'Overnight oats con fresas y miel',cat:'🌾 Avena',g:'cereal',p:10,c:38,f:4,k:228,u:'30g avena + 100g yogurt + 80g fresas + 1 cdita miel'},
+{n:'Overnight oats con maní',cat:'🌾 Avena',g:'cereal',p:12,c:33,f:12,k:284,u:'30g avena + 100g yogurt + 100ml leche + 1 cda mantequilla maní'},
+{n:'Bebida de avena con canela',cat:'🌾 Avena',g:'cereal',p:5,c:22,f:3,k:135,u:'30g avena + 250ml leche fría + canela · licuado 30s'},
+{n:'Bebida de avena con miel y canela',cat:'🌾 Avena',g:'cereal',p:5,c:30,f:3,k:163,u:'30g avena + 250ml leche + 1 cdita miel · licuado'},
+{n:'Avena con maní y banano',cat:'🌾 Avena',g:'cereal',p:10,c:42,f:11,k:305,u:'30g avena + 150ml leche + ½ banano + 1 cda maní · desayuno completo'},
+
+// ── CARBOHIDRATOS PREPARADOS ──
+{n:'Pancakes de avena (3 und)',cat:'🥞 Preparados dulces',g:'cereal',p:14,c:34,f:8,k:266,u:'2 huevos + 30g avena + 1 cdita polvo hornear · sartén antiadherente'},
+{n:'Pancakes de avena con miel',cat:'🥞 Preparados dulces',g:'cereal',p:14,c:46,f:8,k:312,u:'pancakes de avena + 1 cda miel encima'},
+{n:'Pancakes de avena con banano',cat:'🥞 Preparados dulces',g:'cereal',p:14,c:50,f:8,k:328,u:'pancakes de avena + 1 banano en rodajas'},
+{n:'Pancakes de avena con fresas',cat:'🥞 Preparados dulces',g:'cereal',p:14,c:40,f:8,k:288,u:'pancakes de avena + 80g fresas + 1 cdita miel'},
+{n:'Pancakes con arequipe (2 und)',cat:'🥞 Preparados dulces',g:'cereal',p:9,c:42,f:7,k:267,u:'2 pancakes de avena + 1 cda arequipe · ocasional'},
+{n:'Tostada francesa (2 tajadas)',cat:'🥞 Preparados dulces',g:'cereal',p:12,c:28,f:9,k:241,u:'2 taj pan blanco + 1 huevo + leche + canela · sartén 2 min c/lado'},
+{n:'Tostada francesa con miel',cat:'🥞 Preparados dulces',g:'cereal',p:12,c:36,f:9,k:269,u:'tostada francesa + 1 cda miel'},
+{n:'Tostada francesa con banano y miel',cat:'🥞 Preparados dulces',g:'cereal',p:12,c:50,f:9,k:333,u:'tostada francesa + 1 banano + 1 cda miel'},
+{n:'Tostada francesa con arequipe',cat:'🥞 Preparados dulces',g:'cereal',p:12,c:40,f:9,k:289,u:'tostada francesa + 1 cda arequipe · colombiana clásica'},
+{n:'Tostadas con aguacate y huevo',cat:'🥞 Preparados dulces',g:'mixto',p:14,c:28,f:16,k:308,u:'2 taj pan tostado + ¼ aguacate + 1 huevo · salada'},
+{n:'Arepa con huevo y hogao',cat:'🥞 Preparados dulces',g:'mixto',p:12,c:20,f:9,k:213,u:'1 arepa + 1 huevo + hogao de tomate y cebolla'},
+{n:'Tostadas con mantequilla de maní y banano',cat:'🥞 Preparados dulces',g:'cereal',p:10,c:42,f:11,k:303,u:'2 taj pan tostado + 1 cda maní + ½ banano · desayuno express'},
+{n:'Panquecas con mermelada (2 und)',cat:'🥞 Preparados dulces',g:'cereal',p:8,c:44,f:6,k:258,u:'2 panquecas de harina + 1 cda mermelada · más sencillas'},
+{n:'Waffle casero con fruta',cat:'🥞 Preparados dulces',g:'cereal',p:9,c:36,f:7,k:243,u:'1 waffle mediano + 80g fruta · con wafflera'},
+{n:'Mazamorra con leche y panela',cat:'🥞 Preparados dulces',g:'cereal',p:5,c:32,f:3,k:175,u:'1 pocillo maíz cocido + leche + pizca panela · clásica paisa'},
+{n:'Colada de maíz con leche',cat:'🥞 Preparados dulces',g:'cereal',p:4,c:28,f:3,k:155,u:'30g maicena + 200ml leche + canela + panela · espesa'},
 {n:'Chorizo parrilla',cat:'🍖 Embutidos',g:'proteina',p:8,c:1,f:16,k:181,u:'50g · 1 und mediano'},
 {n:'Albóndigas de res (5 und pequeñas)',cat:'🍱 Preparaciones',g:'proteina',p:18,c:4,f:10,k:178,u:'~120g · 5 und pequeñas'},
 {n:'Arepa de yuca con queso y mantequilla',cat:'🍱 Preparaciones',g:'mixto',p:5,c:22,f:8,k:177,u:'1 arepa + 30g queso + 1 cdita mantequilla'},
@@ -1119,8 +1248,17 @@ async function addEntry(entry) {
   if(!data.meals[curMeal]) data.meals[curMeal]=[];
   data.meals[curMeal].push(clean);
   DB.set('day_'+TODAY(),data);
-  await saveDay(TODAY());
-  closeModal();
+  closeModal(); // cerrar modal inmediatamente para no bloquear UX
+  const saved = await saveDay(TODAY());
+  if(!saved) {
+    // Si falla Supabase, el dato ya está en localStorage — no se pierde
+    // Mostrar aviso discreto
+    const tip=document.createElement('div');
+    tip.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#FEF3C7;border:1px solid #F59E0B;border-radius:10px;padding:8px 16px;font-size:12px;font-weight:700;color:#92400E;z-index:300;white-space:nowrap';
+    tip.textContent='⚠️ Guardado local. Sincronizará al reabrir';
+    document.body.appendChild(tip);
+    setTimeout(()=>tip.remove(),3000);
+  }
   const xp=entry.g==='proteina'?12:entry.g==='verdura'?10:entry.g==='fruta'?8:5;
   addXP(xp); checkAchs();
   renderMeals(); updateHdr(totals(TODAY())); renderHeatmap(); renderProgress();
@@ -1499,13 +1637,23 @@ function launchConfetti() {
 //  INIT
 // ═══════════════════════════════════════════════
 function init() {
-  // 1. Renderizar inmediatamente con datos locales
+  // 1. Renderizar inmediatamente con lo que haya en localStorage
   renderHoy();
   renderSum(sumDate);
 
-  // 2. Cargar Supabase — PRIMERO, luego dar XP diario
+  // 2. Sync con Supabase
   loadFromSupabase().then(()=>{
-    // XP diario solo después de tener los datos reales de Supabase
+    // Subir a Supabase cualquier dato local que Supabase no tenga aún
+    const localDates = DB.allDates();
+    localDates.forEach(date=>{
+      const d = DB.day(date);
+      const hasData = Object.values(d.meals).some(e=>e.length>0);
+      if(hasData) saveDay(date); // sync silencioso — sube lo que haya local
+      const s = DB.sups(date);
+      if(Object.keys(s).length>0) saveSups(date);
+    });
+
+    // XP diario
     const g=DB.game();
     if(g.lastDate!==TODAY()){
       g.lastDate=TODAY();
@@ -1514,10 +1662,12 @@ function init() {
       addXP(5);
       checkAchs();
     }
+
+    // Re-renderizar con datos completos
     renderHoy();
     renderSum(sumDate);
   }).catch(()=>{
-    // Sin conexión: dar XP diario con datos locales
+    // Sin conexión — funciona solo con localStorage
     const g=DB.game();
     if(g.lastDate!==TODAY()){g.lastDate=TODAY();DB.set('game',g);addXP(5);checkAchs();}
     renderHoy();
