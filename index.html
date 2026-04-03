@@ -510,8 +510,8 @@ async function sbUpsert(table, body) {
 
 async function loadFromSupabase() {
   const [days, sups, water, game] = await Promise.all([
-    sbGet(`/rest/v1/nl_days?user_key=eq.${USER}&select=date,meals&order=date.desc`),
-    sbGet(`/rest/v1/nl_sups?user_key=eq.${USER}&select=date,data`),
+    sbGet(`/rest/v1/nl_days?user_key=eq.${USER}&select=date,meals,updated_at&order=date.desc`),
+    sbGet(`/rest/v1/nl_sups?user_key=eq.${USER}&select=date,data,updated_at`),
     sbGet(`/rest/v1/nl_water?user_key=eq.${USER}&select=date,glasses`),
     sbGet(`/rest/v1/nl_game?user_key=eq.${USER}&select=xp,unlocked_achs,last_date&limit=1`)
   ]);
@@ -519,30 +519,36 @@ async function loadFromSupabase() {
   if(days) days.forEach(r=>{
     const localDay = DB.day(r.date);
     const localHasData = Object.values(localDay.meals).some(e=>e.length>0);
-    // Solo sobreescribir si local está vacío para esa fecha
-    // Si local tiene datos (usuario ya ingresó algo), NO tocar
-    if(!localHasData) {
+    const localTs = DB.get('ts_day_'+r.date) || 0; // timestamp del último guardado local
+    const sbTs = r.updated_at ? new Date(r.updated_at).getTime() : 0;
+    // Usar Supabase si:
+    // 1. Local está vacío, O
+    // 2. Supabase fue actualizado DESPUÉS del último guardado local (cambio externo)
+    if(!localHasData || sbTs > localTs) {
       DB.set('day_'+r.date, {meals: r.meals||{breakfast:[],morning:[],lunch:[],afternoon:[],dinner:[]}});
+      DB.set('ts_day_'+r.date, sbTs); // guardar timestamp de Supabase
     }
   });
 
   if(sups) sups.forEach(r=>{
     const localSups = DB.sups(r.date);
     const localHasData = Object.keys(localSups).length > 0;
-    if(!localHasData) DB.set('sups_'+r.date, r.data||{});
+    const localTs = DB.get('ts_sups_'+r.date) || 0;
+    const sbTs = r.updated_at ? new Date(r.updated_at).getTime() : 0;
+    if(!localHasData || sbTs > localTs) {
+      DB.set('sups_'+r.date, r.data||{});
+      DB.set('ts_sups_'+r.date, sbTs);
+    }
   });
 
   if(water) water.forEach(r=>{
-    // Solo actualizar agua si local es 0
     if(!DB.water(r.date)) DB.set('water_'+r.date, r.glasses||0);
   });
 
   if(game&&game[0]) {
     const g=game[0];
     const localGame = DB.game();
-    // Tomar el XP más alto entre local y Supabase
     const finalXP = Math.max(g.xp||0, localGame.xp||0);
-    // Merge de logros
     const mergedAchs = [...new Set([...(g.unlocked_achs||[]),...(localGame.achs||[])])];
     DB.set('game',{xp:finalXP, achs:mergedAchs, lastDate:g.last_date||localGame.lastDate});
   }
@@ -550,10 +556,14 @@ async function loadFromSupabase() {
 
 async function saveDay(date) {
   const d = DB.day(date);
-  return await sbUpsert('nl_days',{user_key:USER,date,meals:d.meals});
+  const ok = await sbUpsert('nl_days',{user_key:USER,date,meals:d.meals});
+  if(ok) DB.set('ts_day_'+date, Date.now()); // marcar cuándo guardó local
+  return ok;
 }
 async function saveSups(date) {
-  return await sbUpsert('nl_sups',{user_key:USER,date,data:DB.sups(date)});
+  const ok = await sbUpsert('nl_sups',{user_key:USER,date,data:DB.sups(date)});
+  if(ok) DB.set('ts_sups_'+date, Date.now());
+  return ok;
 }
 async function saveWater(date) {
   return await sbUpsert('nl_water',{user_key:USER,date,glasses:DB.water(date)});
@@ -1047,6 +1057,34 @@ const FOODS=[
 // Chips plátano verde Natuchips (frecuente en D1): 25g = 125kcal
 {n:'Chips plátano verde Natuchips (25g)',cat:'🛒 D1',g:'extra',p:1,c:17,f:7,k:125,u:'25g · 1/5 paquete 125g · plátano verde frito'},
 {n:'Chips plátano maduro Natuchips (28g)',cat:'🛒 D1',g:'extra',p:1,c:21,f:6,k:130,u:'28g · 1 paquete individual'},
+
+// ════════════════════════════════════════════════════════
+// 🌅 MENÚS DE DESAYUNO — registro de un toque
+// ════════════════════════════════════════════════════════
+{n:'Desayuno 1 · Huevo cacerola + queso + café',cat:'🌅 Menús desayuno',g:'mixto',p:19,c:5,f:19,k:274,u:'2 huevos cacerola + 1 taj queso campesino + café con azúcar'},
+{n:'Desayuno 2 · Overnight oats con banano',cat:'🌅 Menús desayuno',g:'mixto',p:14,c:52,f:5,k:301,u:'30g avena + 100g yogurt griego + 100ml leche + 1 banano · preparar noche anterior'},
+{n:'Desayuno 3 · Tostada francesa + yogurt',cat:'🌅 Menús desayuno',g:'mixto',p:20,c:34,f:11,k:311,u:'2 taj pan + 1 huevo + 30ml leche + canela · sartén + 100g yogurt griego al lado'},
+{n:'Desayuno 4 · Avena con queso (salada)',cat:'🌅 Menús desayuno',g:'mixto',p:13,c:22,f:8,k:212,u:'30g avena cocinada con agua + queso campesino desmenuzado + café'},
+{n:'Desayuno 5 · Huevo revuelto + jamón Pietran',cat:'🌅 Menús desayuno',g:'mixto',p:20,c:2,f:16,k:234,u:'2 huevos + 2 taj jamón Pietran + aceite oliva + café'},
+{n:'Desayuno 6 · Pancakes de avena con miel',cat:'🌅 Menús desayuno',g:'mixto',p:18,c:48,f:10,k:348,u:'30g avena + 2 huevos + polvo hornear · sartén + 1 cdita miel + café'},
+{n:'Desayuno 7 · Avena con leche + huevo cocido',cat:'🌅 Menús desayuno',g:'mixto',p:16,c:30,f:10,k:314,u:'30g avena + 200ml leche + 1 cdita miel + canela + 1 huevo cocido duro'},
+{n:'Desayuno 8 · Tortilla jamón y mozzarella',cat:'🌅 Menús desayuno',g:'mixto',p:26,c:1,f:22,k:319,u:'2 huevos + 2 taj jamón Pietran + 50g mozzarella + aceite · doblada en sartén + café'},
+{n:'Desayuno 9 · Overnight oats con yogurt y miel',cat:'🌅 Menús desayuno',g:'mixto',p:14,c:37,f:6,k:269,u:'30g avena + 100g yogurt griego + 100ml leche + 1 cdita miel · nevera'},
+{n:'Desayuno 10 · Huevo cacerola + pan + kéfir',cat:'🌅 Menús desayuno',g:'mixto',p:18,c:22,f:14,k:320,u:'2 huevos cacerola + 1 taj pan integral + 100ml kéfir de mora + café'},
+
+// ════════════════════════════════════════════════════════
+// 🌙 MENÚS DE CENA — ligeras, máximo 5 minutos
+// ════════════════════════════════════════════════════════
+{n:'Cena 1 · Sándwich jamón Pietran + aguacate',cat:'🌙 Menús cena',g:'mixto',p:23,c:35,f:21,k:400,u:'2 taj pan integral + 4 taj jamón Pietran + 2 taj mozzarella + ¼ aguacate + mostaza'},
+{n:'Cena 2 · Huevo con queso y pan',cat:'🌙 Menús cena',g:'mixto',p:22,c:18,f:20,k:328,u:'2 huevos en cacerola + 1 taj queso campesino + 1 taj pan integral + tomate'},
+{n:'Cena 3 · Wrap frío de jamón',cat:'🌙 Menús cena',g:'mixto',p:24,c:30,f:13,k:360,u:'1 tortilla + 3 taj jamón Pietran + 2 taj mozzarella + espinaca + mostaza · sin calentar'},
+{n:'Cena 4 · Mini tabla nocturna',cat:'🌙 Menús cena',g:'mixto',p:21,c:16,f:13,k:300,u:'3 taj jamón Pietran + 2 taj mozzarella + 6 aceitunas + 3 galletas arroz + tomate cherry'},
+{n:'Cena 5 · Quesadilla rápida',cat:'🌙 Menús cena',g:'mixto',p:20,c:28,f:14,k:310,u:'1 tortilla + 50g mozzarella + 2 taj jamón Pietran · sartén vuelta y vuelta 2 min'},
+{n:'Cena 6 · Tostadas con atún y aguacate',cat:'🌙 Menús cena',g:'mixto',p:26,c:28,f:9,k:305,u:'2 taj pan integral tostado + ½ lata atún en agua + ¼ aguacate + tomate + limón'},
+{n:'Cena 7 · Huevo revuelto + jamón (sin pan)',cat:'🌙 Menús cena',g:'mixto',p:26,c:2,f:17,k:261,u:'2 huevos revueltos + 4 taj jamón Pietran + aceite oliva · sin pan · bajo en carbos'},
+{n:'Cena 8 · Sándwich pavo + aguacate',cat:'🌙 Menús cena',g:'mixto',p:28,c:32,f:15,k:380,u:'2 taj pan integral + 4 taj jamón pavo Pietran + 2 taj mozzarella + ¼ aguacate'},
+{n:'Cena 9 · Yogurt con queso y galletas',cat:'🌙 Menús cena',g:'mixto',p:18,c:16,f:10,k:250,u:'100g yogurt griego + 2 taj queso campesino + 3 galletas arroz · mínimo esfuerzo'},
+{n:'Cena 10 · Tortilla de queso (sin pan)',cat:'🌙 Menús cena',g:'mixto',p:24,c:1,f:20,k:290,u:'2 huevos + 50g mozzarella + aceite · doblada en sartén · sin carbos'},
 
 ];
 
