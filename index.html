@@ -137,6 +137,7 @@ html,body{height:100%;background:var(--bg);color:var(--body);font-family:-apple-
 .tp{background:rgba(15,118,110,.1);color:var(--prot)}
 .tk{background:rgba(194,65,12,.1);color:var(--kcal)}
 .tc{background:rgba(109,40,217,.1);color:var(--carb)}
+.tf{background:rgba(30,99,176,.1);color:var(--fat)}
 .xbtn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;padding:2px 5px;line-height:1}
 .emeal{padding:12px;font-size:12px;color:var(--muted);font-style:italic}
 .mtots{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
@@ -967,6 +968,34 @@ const FOODS=[
 // Bocadillo veleño: datos etiqueta real — 40g = 143kcal · C:46g · P:0g · G:0g (dato usuario)
 // Nota: casi puro azúcar de guayaba — carbos rápidos, sin proteína ni grasa
 {n:'Bocadillo veleño (1 tajada 40g)',cat:'🍬 Dulces típicos',g:'extra',p:0,c:35,f:0,k:130,u:'40g · 1 tajada · 100% guayaba y azúcar'},
+
+// ── FRIJOLES ──────────────────────────────────────────
+{n:'Fríjoles con guiso (¼ cucharón 60g)',cat:'🫘 Fríjoles',g:'leguminosa',p:5,c:14,f:1,k:85,u:'60g · ¼ cucharón · porción pequeña'},
+{n:'Fríjoles con guiso (½ cucharón 100g)',cat:'🫘 Fríjoles',g:'leguminosa',p:8,c:22,f:1,k:130,u:'100g · ½ cucharón · porción media'},
+{n:'Fríjoles con guiso (1 cucharón 180g)',cat:'🫘 Fríjoles',g:'leguminosa',p:14,c:40,f:2,k:234,u:'180g · 1 cucharón lleno · porción completa'},
+{n:'Fríjoles con hogao y costilla (½ cucharón)',cat:'🫘 Fríjoles',g:'leguminosa',p:14,c:22,f:5,k:189,u:'100g fríjol + 30g costilla desmenuzada'},
+{n:'Sopa de fríjoles (1 taza 250ml)',cat:'🫘 Fríjoles',g:'leguminosa',p:8,c:20,f:2,k:130,u:'250ml · 1 taza · caldito con fríjol'},
+{n:'Fríjoles con arroz (combinado)',cat:'🫘 Fríjoles',g:'mixto',p:10,c:42,f:1,k:218,u:'100g fríjol + 4 cdas arroz blanco'},
+{n:'Fríjoles con arroz y chicharrón',cat:'🫘 Fríjoles',g:'mixto',p:13,c:26,f:8,k:228,u:'100g fríjol + 2 cdas arroz + 15g chicharrón · mini bandeja'},
+
+// ── GUACAMOLE CASERO ──────────────────────────────────
+{n:'Guacamole casero (2 cdas 50g)',cat:'🥑 Guacamole',g:'grasa',p:1,c:4,f:7,k:83,u:'50g · 2 cdas · aguacate + limón + cebolla + sal'},
+{n:'Guacamole casero (4 cdas 100g)',cat:'🥑 Guacamole',g:'grasa',p:2,c:8,f:14,k:166,u:'100g · 4 cdas · 1 aguacate mediano'},
+{n:'Guacamole casero (6 cdas 150g)',cat:'🥑 Guacamole',g:'grasa',p:3,c:12,f:21,k:249,u:'150g · 6 cdas · 1½ aguacate · porción grande'},
+{n:'Guacamole + galletas arroz (snack)',cat:'🥑 Guacamole',g:'grasa',p:2,c:18,f:7,k:143,u:'50g guacamole + 2 galletas arroz'},
+{n:'Guacamole + Saltinas (snack)',cat:'🥑 Guacamole',g:'grasa',p:3,c:20,f:9,k:173,u:'50g guacamole + 2 tablas Saltinas'},
+{n:'Guacamole + tostada pan integral',cat:'🥑 Guacamole',g:'grasa',p:5,c:22,f:9,k:189,u:'50g guacamole + 1 tajada pan integral tostado'},
+
+// ── CARNE MOLIDA ──────────────────────────────────────
+{n:'Carne molida (¼ taza 40g cocida)',cat:'🥩 Carne molida',g:'proteina',p:8,c:0,f:4,k:68,u:'40g cocida · ¼ taza · porción mínima'},
+{n:'Carne molida (½ taza 80g cocida)',cat:'🥩 Carne molida',g:'proteina',p:16,c:0,f:8,k:136,u:'80g cocida · ½ taza · porción media'},
+{n:'Carne molida (1 taza 160g cocida)',cat:'🥩 Carne molida',g:'proteina',p:32,c:0,f:16,k:272,u:'160g cocida · 1 taza · porción grande'},
+{n:'Carne molida guisada con hogao (½ taza)',cat:'🥩 Carne molida',g:'proteina',p:15,c:4,f:8,k:148,u:'80g carne + hogao de tomate y cebolla'},
+{n:'Carne molida con papa picada (½ plato)',cat:'🥩 Carne molida',g:'mixto',p:16,c:20,f:8,k:220,u:'80g carne + 80g papa picada · picadillo casero'},
+{n:'Carne molida con verduras (½ plato)',cat:'🥩 Carne molida',g:'mixto',p:18,c:8,f:8,k:180,u:'80g carne + tomate + cebolla + pimentón'},
+{n:'Albóndigas de res (3 und pequeñas)',cat:'🥩 Carne molida',g:'proteina',p:11,c:3,f:6,k:107,u:'~70g · 3 albóndigas pequeñas caseras'},
+{n:'Albóndigas de res (5 und pequeñas)',cat:'🥩 Carne molida',g:'proteina',p:18,c:4,f:10,k:178,u:'~120g · 5 albóndigas · porción estándar'},
+{n:'Albóndigas de res (8 und pequeñas)',cat:'🥩 Carne molida',g:'proteina',p:29,c:7,f:16,k:285,u:'~190g · 8 albóndigas · porción grande'},
 {n:'Bocadillo veleño (2 tajadas 80g)',cat:'🍬 Dulces típicos',g:'extra',p:0,c:70,f:0,k:260,u:'80g · 2 tajadas'},
 {n:'Bocadillo con queso campesino (snack)',cat:'🍬 Dulces típicos',g:'extra',p:5,c:36,f:4,k:200,u:'40g bocadillo + 30g queso · clásico colombiano · P+C balanceados'},
 {n:'Bocadillo con maní (snack)',cat:'🍬 Dulces típicos',g:'extra',p:8,c:38,f:16,k:326,u:'40g bocadillo + 30g maní · energía alta · pre-actividad'},
@@ -1085,6 +1114,38 @@ const FOODS=[
 {n:'Cena 8 · Sándwich pavo + aguacate',cat:'🌙 Menús cena',g:'mixto',p:28,c:32,f:15,k:380,u:'2 taj pan integral + 4 taj jamón pavo Pietran + 2 taj mozzarella + ¼ aguacate'},
 {n:'Cena 9 · Yogurt con queso y galletas',cat:'🌙 Menús cena',g:'mixto',p:18,c:16,f:10,k:250,u:'100g yogurt griego + 2 taj queso campesino + 3 galletas arroz · mínimo esfuerzo'},
 {n:'Cena 10 · Tortilla de queso (sin pan)',cat:'🌙 Menús cena',g:'mixto',p:24,c:1,f:20,k:290,u:'2 huevos + 50g mozzarella + aceite · doblada en sartén · sin carbos'},
+
+// ── FRIJOLES ─────────────────────────────────────────
+{n:'Fríjoles con guiso (¼ cucharón 60g)',cat:'🫘 Fríjoles',g:'leguminosa',p:5,c:14,f:1,k:85,u:'60g · ¼ cucharón · porción pequeña'},
+{n:'Fríjoles con guiso (½ cucharón 100g)',cat:'🫘 Fríjoles',g:'leguminosa',p:8,c:22,f:1,k:130,u:'100g · ½ cucharón · porción media'},
+{n:'Fríjoles con guiso (1 cucharón 180g)',cat:'🫘 Fríjoles',g:'leguminosa',p:14,c:40,f:2,k:234,u:'180g · 1 cucharón lleno'},
+{n:'Fríjoles con hogao y costilla (½ cucharón)',cat:'🫘 Fríjoles',g:'leguminosa',p:14,c:22,f:5,k:189,u:'100g fríjol + 30g costilla desmenuzada'},
+{n:'Sopa de fríjoles (1 taza 250ml)',cat:'🫘 Fríjoles',g:'leguminosa',p:8,c:20,f:2,k:130,u:'250ml · 1 taza · caldito con fríjol'},
+{n:'Fríjoles con arroz (combinado)',cat:'🫘 Fríjoles',g:'mixto',p:10,c:42,f:1,k:218,u:'100g fríjol + 4 cdas arroz blanco'},
+{n:'Fríjoles con arroz y chicharrón',cat:'🫘 Fríjoles',g:'mixto',p:13,c:26,f:8,k:228,u:'100g fríjol + 2 cdas arroz + 15g chicharrón'},
+
+// ── GUACAMOLE CASERO ─────────────────────────────────
+{n:'Guacamole casero (2 cdas 50g)',cat:'🥑 Guacamole',g:'grasa',p:1,c:4,f:7,k:83,u:'50g · 2 cdas · aguacate + limón + cebolla + sal'},
+{n:'Guacamole casero (4 cdas 100g)',cat:'🥑 Guacamole',g:'grasa',p:2,c:8,f:14,k:166,u:'100g · 4 cdas · 1 aguacate mediano'},
+{n:'Guacamole casero (6 cdas 150g)',cat:'🥑 Guacamole',g:'grasa',p:3,c:12,f:21,k:249,u:'150g · 6 cdas · 1½ aguacate'},
+{n:'Guacamole + galletas arroz (snack)',cat:'🥑 Guacamole',g:'grasa',p:2,c:18,f:7,k:143,u:'50g guacamole + 2 galletas arroz'},
+{n:'Guacamole + Saltinas (snack)',cat:'🥑 Guacamole',g:'grasa',p:3,c:20,f:9,k:173,u:'50g guacamole + 2 tablas Saltinas'},
+{n:'Guacamole + tostada pan integral',cat:'🥑 Guacamole',g:'grasa',p:5,c:22,f:9,k:189,u:'50g guacamole + 1 tajada pan integral tostado'},
+
+// ── CARNE MOLIDA ─────────────────────────────────────
+{n:'Carne molida (¼ taza 40g cocida)',cat:'🥩 Carne molida',g:'proteina',p:8,c:0,f:4,k:68,u:'40g cocida · ¼ taza · porción mínima'},
+{n:'Carne molida (½ taza 80g cocida)',cat:'🥩 Carne molida',g:'proteina',p:16,c:0,f:8,k:136,u:'80g cocida · ½ taza · porción media'},
+{n:'Carne molida (1 taza 160g cocida)',cat:'🥩 Carne molida',g:'proteina',p:32,c:0,f:16,k:272,u:'160g cocida · 1 taza · porción grande'},
+{n:'Carne molida guisada con hogao (½ taza)',cat:'🥩 Carne molida',g:'proteina',p:15,c:4,f:8,k:148,u:'80g carne + hogao de tomate y cebolla'},
+{n:'Carne molida con papa picada (½ plato)',cat:'🥩 Carne molida',g:'mixto',p:16,c:20,f:8,k:220,u:'80g carne + 80g papa picada · picadillo casero'},
+{n:'Carne molida con verduras (½ plato)',cat:'🥩 Carne molida',g:'mixto',p:18,c:8,f:8,k:180,u:'80g carne + tomate + cebolla + pimentón'},
+{n:'Albóndigas de res (3 und pequeñas)',cat:'🥩 Carne molida',g:'proteina',p:11,c:3,f:6,k:107,u:'~70g · 3 albóndigas pequeñas'},
+{n:'Albóndigas de res (5 und pequeñas)',cat:'🥩 Carne molida',g:'proteina',p:18,c:4,f:10,k:178,u:'~120g · 5 albóndigas · porción estándar'},
+{n:'Albóndigas de res (8 und pequeñas)',cat:'🥩 Carne molida',g:'proteina',p:29,c:7,f:16,k:285,u:'~190g · 8 albóndigas · porción grande'},
+
+// ── SNACKS DE PLÁTANO ─────────────────────────────────
+{n:'Platanitos Mineditas plátano verde (50g)',cat:'🍌 Snacks plátano',g:'extra',p:2,c:18,f:2,k:230,u:'50g · 1 paquete · etiqueta real Mineditas'},
+{n:'Platanitos Mineditas plátano verde (25g)',cat:'🍌 Snacks plátano',g:'extra',p:1,c:9,f:1,k:115,u:'25g · ½ paquete'},
 
 ];
 
@@ -1247,6 +1308,7 @@ function renderMeals() {
           <span class="tag tp">${e.p}P</span>
           <span class="tag tk">${e.k}k</span>
           <span class="tag tc">${e.c}C</span>
+          <span class="tag tf">${e.f}G</span>
         </div>
         <button class="xbtn" onclick="delEntry('${m.id}',${i})">×</button>
       </div>`;
@@ -1256,9 +1318,13 @@ function renderMeals() {
     if(has) {
       const tp=entries.reduce((a,x)=>a+(x.p||0),0);
       const tk=entries.reduce((a,x)=>a+(x.k||0),0);
+      const tc=entries.reduce((a,x)=>a+(x.c||0),0);
+      const tf=entries.reduce((a,x)=>a+(x.f||0),0);
       tots=`<div class="mtots">
-        <span class="tchip">💪 ${tp}g prot</span>
-        <span class="tchip">🔥 ${tk} kcal</span>
+        <span class="tchip" style="color:var(--prot)">💪 ${tp}g P</span>
+        <span class="tchip" style="color:var(--kcal)">🔥 ${tk} kcal</span>
+        <span class="tchip" style="color:var(--carb)">🌾 ${tc}g C</span>
+        <span class="tchip" style="color:var(--fat)">🥑 ${tf}g G</span>
       </div>`;
     }
     html+=`<div class="mblock">
