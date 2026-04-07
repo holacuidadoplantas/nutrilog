@@ -299,6 +299,26 @@ html,body{height:100%;background:var(--bg);color:var(--body);font-family:-apple-
 .toast-close{background:var(--prot);border:none;border-radius:10px;padding:9px 22px;color:var(--bg);font-size:13px;font-weight:800;cursor:pointer;font-family:inherit}
 
 @media print{.nav,.rep-btn,.rep-btn2{display:none!important}.page{display:block!important;overflow:visible!important;position:static!important}.pages,.app{overflow:visible!important;height:auto!important}}
+
+/* ── CUERPO ── */
+.body-baseline{background:linear-gradient(135deg,#F0F7FF,#F0FDF4);border:1px solid #BFDBFE;border-radius:var(--r);padding:14px;margin-bottom:12px}
+.body-baseline-title{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--sky);margin-bottom:10px}
+.body-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.body-cell{background:var(--card);border:1px solid var(--line);border-radius:var(--rs);padding:10px 12px}
+.body-cell-lbl{font-size:9px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:3px}
+.body-cell-val{font-size:16px;font-weight:900;color:var(--bright)}
+.body-cell-base{font-size:10px;color:var(--muted);margin-top:2px}
+.body-cell-diff{font-size:11px;font-weight:700;margin-top:2px}
+.pliegue-row{display:flex;align-items:center;padding:9px 14px;border-bottom:1px solid var(--line);gap:10px}
+.pliegue-row:last-child{border-bottom:none}
+.pliegue-name{font-size:12px;color:var(--body);flex:1}
+.pliegue-base{font-size:11px;color:var(--muted);width:50px;text-align:right}
+.pliegue-val{font-size:13px;font-weight:800;width:55px;text-align:right}
+.pliegue-input{width:60px;background:var(--bg3);border:1px solid var(--line2);border-radius:8px;padding:6px 8px;color:var(--bright);font-size:13px;font-family:inherit;text-align:center;outline:none}
+.pliegue-input:focus{border-color:var(--prot)}
+.save-body-btn{width:100%;background:var(--prot);border:none;border-radius:12px;padding:13px;color:#fff;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;margin-top:8px}
+.progress-bar-body{height:8px;background:var(--line);border-radius:4px;overflow:hidden;margin-top:4px}
+.progress-bar-body-fill{height:100%;border-radius:4px;transition:width .5s}
 </style>
 </head>
 <body>
@@ -393,6 +413,10 @@ html,body{height:100%;background:var(--bg);color:var(--body);font-family:-apple-
     <div class="page" id="pageLogros">
       <div id="achDiv"></div>
     </div>
+    <!-- CUERPO -->
+    <div class="page" id="pageCuerpo">
+      <div id="cuerpoDiv"></div>
+    </div>
     <!-- INFORME -->
     <div class="page" id="pageInforme">
       <div id="repDiv"></div>
@@ -405,6 +429,7 @@ html,body{height:100%;background:var(--bg);color:var(--body);font-family:-apple-
     <button class="nb" onclick="goPage('Resumen',this)"><div class="nb-ico">📊</div><div class="nb-lbl">Resumen</div></button>
     <button class="nb" onclick="goPage('Historial',this)"><div class="nb-ico">📅</div><div class="nb-lbl">Historial</div></button>
     <button class="nb" onclick="goPage('Logros',this)"><div class="nb-ico">🏆</div><div class="nb-lbl">Logros</div></button>
+    <button class="nb" onclick="goPage('Cuerpo',this)"><div class="nb-ico">📏</div><div class="nb-lbl">Cuerpo</div></button>
     <button class="nb" onclick="goPage('Informe',this)"><div class="nb-ico">📋</div><div class="nb-lbl">Informe</div></button>
   </div>
 </div>
@@ -1035,6 +1060,8 @@ const FOODS=[
 // Yogurt griego Latti D1: 100g = 107kcal · P:5.5g · C:3.5g · G:7.9g
 {n:'Yogurt griego natural Latti D1 (100g)',cat:'🛒 D1',g:'lacteo',p:6,c:4,f:8,k:107,u:'100g · sin azúcar añadida · etiqueta Latti D1'},
 {n:'Yogurt griego natural Latti D1 (200g)',cat:'🛒 D1',g:'lacteo',p:11,c:7,f:16,k:214,u:'200g · 1 pocillo completo'},
+{n:'Yogurt con fruta Latti (1 porción 160g)',cat:'🛒 D1',g:'lacteo',p:8,c:21,f:4,k:152,u:'160g · 1 porción · etiqueta real: 4.2g grasa'},
+{n:'Yogurt con fruta Latti (½ porción 80g)',cat:'🛒 D1',g:'lacteo',p:4,c:11,f:2,k:76,u:'80g · ½ porción'},
 
 // — SNACKS D1 MANÍ Y MEZCLAS —
 // D1 vende maní tostado salado y mezclas similares a La Especial
@@ -1168,6 +1195,7 @@ function goPage(name, btn) {
   if(name==='Resumen')  renderSum(sumDate);
   if(name==='Historial') renderHist();
   if(name==='Logros')    renderAch();
+  if(name==='Cuerpo')    renderCuerpo();
   if(name==='Informe')   renderRep();
 }
 
@@ -1868,6 +1896,222 @@ function launchConfetti() {
 // ═══════════════════════════════════════════════
 //  INIT
 // ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════
+//  CUERPO — Seguimiento composición corporal
+// ═══════════════════════════════════════════════
+
+// Datos baseline de Angie (9 marzo 2026)
+const BASELINE = {
+  fecha: '09/03/2026',
+  peso: 63.2,
+  pct_graso: 35.2,
+  grasa_kg: 22.2,
+  magra_kg: 41.0,
+  suma_6pl: 149.0,
+  pliegues: {
+    triceps:      {val:21.0, label:'Tríceps'},
+    subescapular: {val:20.0, label:'Subescapular'},
+    biceps:       {val:20.0, label:'Bíceps'},
+    cresta_iliaca:{val:19.0, label:'Cresta ilíaca'},
+    supraespinal: {val:22.0, label:'Supraespinal'},
+    abdominal:    {val:26.0, label:'Abdominal'},
+    muslo:        {val:33.0, label:'Muslo'},
+    pantorrilla:  {val:27.0, label:'Pantorrilla'},
+  },
+  circs: {
+    cintura:    {val:78.8,  label:'Cintura mínima'},
+    cadera:     {val:110.5, label:'Caderas máxima'},
+    brazo_rel:  {val:31.3,  label:'Brazo relajado'},
+    brazo_flex: {val:30.4,  label:'Brazo flexionado'},
+    pantorrilla:{val:39.0,  label:'Pantorrilla'},
+    muslo:      {val:58.5,  label:'Muslo'},
+  }
+};
+
+// Objetivos de Angie
+const BODY_GOALS = {
+  peso: 74.5,
+  magra_kg: 66.6,
+  pct_graso: 10.7,
+};
+
+function renderCuerpo() {
+  const mediciones = DB.get('body_mediciones') || [];
+  const ultima = mediciones.length ? mediciones[mediciones.length-1] : null;
+
+  // Tarjeta de composición actual
+  const peso = ultima?.peso || BASELINE.peso;
+  const pct = ultima?.pct_graso || BASELINE.pct_graso;
+  const grasa = ultima ? (peso * pct/100).toFixed(1) : BASELINE.grasa_kg;
+  const magra = ultima ? (peso - grasa).toFixed(1) : BASELINE.magra_kg;
+
+  function diffStr(actual, base, invert=false) {
+    const d = parseFloat((actual - base).toFixed(1));
+    if(d===0) return '';
+    const mejor = invert ? d<0 : d>0;
+    const col = mejor ? 'var(--prot)' : 'var(--kcal)';
+    return `<div class="body-cell-diff" style="color:${col}">${d>0?'+':''}${d} vs línea base</div>`;
+  }
+
+  // Calcular % hacia objetivo
+  const pctMagra = Math.min(100, Math.round((parseFloat(magra)-BASELINE.magra_kg)/(BODY_GOALS.magra_kg-BASELINE.magra_kg)*100));
+  const pctGrasa = Math.min(100, Math.round((BASELINE.pct_graso-pct)/(BASELINE.pct_graso-BODY_GOALS.pct_graso)*100));
+
+  document.getElementById('cuerpoDiv').innerHTML = `
+    <div class="body-baseline">
+      <div class="body-baseline-title">📊 Línea base · Angie Burbano · ${BASELINE.fecha}</div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--sub)">
+        <span>⚖️ Peso: <b>${BASELINE.peso}kg</b></span>
+        <span>🔴 Grasa: <b>${BASELINE.pct_graso}% · ${BASELINE.grasa_kg}kg</b></span>
+        <span>💪 Magra: <b>${BASELINE.magra_kg}kg</b></span>
+        <span>📏 Suma 6pl: <b>${BASELINE.suma_6pl}mm</b></span>
+      </div>
+      <div style="margin-top:8px;font-size:11px;color:var(--muted)">
+        Objetivo Angie → Peso: ${BODY_GOALS.peso}kg · Magra: ${BODY_GOALS.magra_kg}kg · %Grasa: ${BODY_GOALS.pct_graso}%
+      </div>
+    </div>
+
+    <div class="body-grid">
+      <div class="body-cell">
+        <div class="body-cell-lbl">⚖️ Peso actual</div>
+        <div class="body-cell-val">${peso}<small style="font-size:12px">kg</small></div>
+        <div class="body-cell-base">Base: ${BASELINE.peso}kg · Meta: ${BODY_GOALS.peso}kg</div>
+        ${diffStr(peso, BASELINE.peso, true)}
+      </div>
+      <div class="body-cell">
+        <div class="body-cell-lbl">🔴 % Grasa</div>
+        <div class="body-cell-val" style="color:var(--kcal)">${pct}<small style="font-size:12px">%</small></div>
+        <div class="body-cell-base">Base: ${BASELINE.pct_graso}% · Meta: ${BODY_GOALS.pct_graso}%</div>
+        ${diffStr(pct, BASELINE.pct_graso, true)}
+      </div>
+      <div class="body-cell">
+        <div class="body-cell-lbl">💪 Masa magra</div>
+        <div class="body-cell-val" style="color:var(--prot)">${magra}<small style="font-size:12px">kg</small></div>
+        <div class="body-cell-base">Base: ${BASELINE.magra_kg}kg · Meta: ${BODY_GOALS.magra_kg}kg</div>
+        <div class="progress-bar-body"><div class="progress-bar-body-fill" style="width:${Math.max(0,pctMagra)}%;background:var(--prot)"></div></div>
+        <div style="font-size:9px;color:var(--muted);margin-top:2px">${Math.max(0,pctMagra)}% hacia la meta</div>
+      </div>
+      <div class="body-cell">
+        <div class="body-cell-lbl">🔴 Grasa total</div>
+        <div class="body-cell-val" style="color:var(--kcal)">${grasa}<small style="font-size:12px">kg</small></div>
+        <div class="body-cell-base">Base: ${BASELINE.grasa_kg}kg</div>
+        ${diffStr(parseFloat(grasa), BASELINE.grasa_kg, true)}
+      </div>
+    </div>
+
+    <!-- NUEVA MEDICIÓN -->
+    <div class="section-lbl">📏 Registrar nueva medición</div>
+    <div class="card">
+      <div class="card-head"><span class="card-title">Pliegues cutáneos (mm)</span><span style="font-size:10px;color:var(--muted)">Base Angie · 9/mar</span></div>
+      ${Object.entries(BASELINE.pliegues).map(([k,pl])=>`
+        <div class="pliegue-row">
+          <div class="pliegue-name">${pl.label}</div>
+          <div class="pliegue-base">${pl.val}mm</div>
+          <input class="pliegue-input" type="number" id="pl_${k}" placeholder="${pl.val}" min="1" max="80">
+        </div>`).join('')}
+    </div>
+
+    <div class="card" style="margin-top:0">
+      <div class="card-head"><span class="card-title">Circunferencias (cm)</span></div>
+      ${Object.entries(BASELINE.circs).map(([k,c])=>`
+        <div class="pliegue-row">
+          <div class="pliegue-name">${c.label}</div>
+          <div class="pliegue-base">${c.val}cm</div>
+          <input class="pliegue-input" type="number" id="circ_${k}" placeholder="${c.val}" min="10" max="200" step="0.1">
+        </div>`).join('')}
+    </div>
+
+    <div style="padding:0 0 8px">
+      <label class="flbl">Peso (kg)</label>
+      <input class="finput" type="number" id="body_peso" placeholder="${peso}" min="40" max="120" step="0.1">
+    </div>
+
+    <button class="save-body-btn" onclick="saveBodyMedicion()">💾 Guardar medición de hoy</button>
+    ${mediciones.length ? `
+    <div class="section-lbl" style="margin-top:16px">📅 Historial de mediciones</div>
+    <div class="card">
+      ${mediciones.slice().reverse().map(m=>`
+        <div class="pliegue-row">
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:700;color:var(--bright)">${m.fecha}</div>
+            <div style="font-size:11px;color:var(--sub)">Suma pliegues: ${m.suma_pl}mm · %Grasa est: ${m.pct_est}%</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:13px;font-weight:800;color:var(--prot)">${m.magra_est}kg magra</div>
+            <div style="font-size:11px;color:var(--kcal)">${m.grasa_est}kg grasa</div>
+          </div>
+        </div>`).join('')}
+    </div>` : ''}
+  `;
+}
+
+async function saveBodyMedicion() {
+  const fecha = new Date().toLocaleDateString('es-CO');
+  const peso = parseFloat(document.getElementById('body_peso').value) || BASELINE.peso;
+
+  // Recoger pliegues
+  const pls = {};
+  let suma = 0;
+  Object.keys(BASELINE.pliegues).forEach(k=>{
+    const v = parseFloat(document.getElementById('pl_'+k).value) || BASELINE.pliegues[k].val;
+    pls[k] = v;
+    suma += v;
+  });
+
+  // Recoger circunferencias
+  const circs = {};
+  Object.keys(BASELINE.circs).forEach(k=>{
+    circs[k] = parseFloat(document.getElementById('circ_'+k).value) || BASELINE.circs[k].val;
+  });
+
+  // Estimación % grasa por Durnin & Womersley (suma 4 pliegues)
+  const suma4 = pls.triceps + pls.subescapular + pls.biceps + pls.cresta_iliaca;
+  const densidad = 1.1549 - (0.0678 * Math.log10(suma4));
+  const pct_est = parseFloat(((4.95/densidad - 4.50)*100).toFixed(1));
+  const grasa_est = parseFloat((peso * pct_est/100).toFixed(1));
+  const magra_est = parseFloat((peso - grasa_est).toFixed(1));
+
+  const medicion = {
+    fecha, peso, pliegues: pls, circs,
+    suma_pl: parseFloat(suma.toFixed(1)),
+    pct_est, grasa_est, magra_est
+  };
+
+  // Guardar localmente
+  const mediciones = DB.get('body_mediciones') || [];
+  mediciones.push(medicion);
+  DB.set('body_mediciones', mediciones);
+
+  // Guardar en Supabase
+  await sbUpsert('nl_body', {
+    user_key: USER,
+    date: TODAY(),
+    peso: peso,
+    pl_triceps: pls.triceps,
+    pl_subescapular: pls.subescapular,
+    pl_biceps: pls.biceps,
+    pl_cresta_iliaca: pls.cresta_iliaca,
+    pl_supraespinal: pls.supraespinal,
+    pl_abdominal: pls.abdominal,
+    pl_muslo: pls.muslo,
+    pl_pantorrilla: pls.pantorrilla,
+    suma_6pl: suma,
+    pct_graso: pct_est,
+    grasa_kg: grasa_est,
+    magra_kg: magra_est,
+    circ_cintura: circs.cintura,
+    circ_cadera: circs.cadera,
+    circ_brazo_rel: circs.brazo_rel,
+    circ_brazo_flex: circs.brazo_flex,
+    circ_pantorrilla: circs.pantorrilla,
+    circ_muslo: circs.muslo,
+  });
+
+  showToast('📏','¡Medición guardada!',
+    `Suma pliegues: ${suma.toFixed(0)}mm\n%Grasa est: ${pct_est}% · Magra est: ${magra_est}kg`,0);
+  renderCuerpo();
+}
+
 function init() {
   // 1. Renderizar inmediatamente con lo que haya en localStorage
   renderHoy();
