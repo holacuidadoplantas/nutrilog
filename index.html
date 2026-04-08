@@ -696,21 +696,25 @@ const ACHIEVEMENTS = [
 let FOODS=[];
 
 async function loadFoods() {
-  // Intentar desde localStorage primero (cache)
-  const cached = DB.get('foods_cache');
+  // Limpiar cache viejo que pueda venir del HTML anterior (array hardcodeado)
   const cachedAt = DB.get('foods_cache_ts') || 0;
   const ONE_DAY = 24*60*60*1000;
-  if(cached && cached.length > 0 && (Date.now()-cachedAt) < ONE_DAY) {
+  const cached = DB.get('foods_cache');
+  // Cache válido: existe, tiene datos, es de hoy, y viene de Supabase (tiene campo 'n' como objeto)
+  if(cached && Array.isArray(cached) && cached.length > 100 && (Date.now()-cachedAt) < ONE_DAY) {
     FOODS = cached;
+    console.log('Alimentos desde cache:', FOODS.length);
     return;
   }
   // Descargar de Supabase
   try {
+    console.log('Descargando alimentos de Supabase...');
     const data = await sbGet('/rest/v1/nl_foods?activo=eq.true&select=n,cat,g,p,c,f,k,u&order=cat.asc,n.asc&limit=500');
     if(data && data.length > 0) {
       FOODS = data;
       DB.set('foods_cache', data);
       DB.set('foods_cache_ts', Date.now());
+      console.log('Alimentos cargados desde Supabase:', FOODS.length);
     }
   } catch(e) {
     console.error('Error cargando alimentos:', e);
@@ -967,6 +971,12 @@ document.getElementById('searchIn').addEventListener('keydown',e=>{ if(e.key==='
 function doSearch() {
   const q=document.getElementById('searchIn').value.toLowerCase().trim();
   const el=document.getElementById('results');
+  // Si FOODS aún no cargó, mostrar mensaje y reintentar
+  if(FOODS.length === 0) {
+    el.innerHTML='<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">⏳ Cargando alimentos...</div>';
+    loadFoods().then(()=>doSearch());
+    return;
+  }
   if(!q) {
     const cats=[...new Set(FOODS.map(f=>f.cat))];
     el.innerHTML=cats.map(c=>`
