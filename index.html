@@ -695,24 +695,16 @@ const ACHIEVEMENTS = [
 // ═══════════════════════════════════════════════
 let FOODS=[];
 
-const FOODS_VERSION = 2; // Incrementar para forzar recarga
-
 async function loadFoods() {
   const cachedAt = DB.get('foods_cache_ts') || 0;
-  const cachedVer = DB.get('foods_cache_ver') || 0;
-  const ONE_DAY = 24*60*60*1000;
+  const SIX_HOURS = 6*60*60*1000;
   const cached = DB.get('foods_cache');
-  // Cache válido: misma versión, tiene datos suficientes, menos de 24h
-  if(cached && Array.isArray(cached) && cached.length > 100 
-     && cachedVer === FOODS_VERSION
-     && (Date.now()-cachedAt) < ONE_DAY) {
+  // Cache válido: tiene datos y es de menos de 6 horas
+  if(cached && Array.isArray(cached) && cached.length > 100
+     && (Date.now()-cachedAt) < SIX_HOURS) {
     FOODS = cached;
-    console.log('Alimentos desde cache:', FOODS.length);
     return;
   }
-  // Cache inválido o viejo — limpiar
-  DB.set('foods_cache', null);
-  DB.set('foods_cache_ts', 0);
   // Descargar de Supabase
   try {
     console.log('Descargando alimentos de Supabase...');
@@ -727,7 +719,6 @@ async function loadFoods() {
         FOODS = data;
         DB.set('foods_cache', data);
         DB.set('foods_cache_ts', Date.now());
-        DB.set('foods_cache_ver', FOODS_VERSION);
       }
     } else {
       const err = await r.text();
