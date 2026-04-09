@@ -422,6 +422,78 @@ html,body{height:100%;background:var(--bg);color:var(--body);font-family:'Plus J
     <div class="page" id="pageCuerpo">
       <div id="cuerpoDiv"></div>
     </div>
+    <!-- EJERCICIO -->
+    <div class="page" id="pageEjercicio">
+      <div class="section-lbl">Registrar sesión</div>
+
+      <!-- REMO -->
+      <div class="card" id="remoCard">
+        <div class="card-head">
+          <span class="card-title">🚣 Remo</span>
+          <span id="remoFecha" style="font-size:12px;color:var(--muted)"></span>
+        </div>
+        <div style="padding:14px">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+            <div>
+              <div style="font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin-bottom:5px">Tiempo (min)</div>
+              <input id="remoDuracion" type="number" min="1" max="120" placeholder="20"
+                style="width:100%;background:var(--bg3);border:1.5px solid var(--line2);border-radius:10px;padding:10px 12px;color:var(--bright);font-size:18px;font-weight:800;font-family:inherit;outline:none;text-align:center"
+                oninput="calcSpm()">
+            </div>
+            <div>
+              <div style="font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin-bottom:5px">Distancia (m)</div>
+              <input id="remoDistancia" type="number" min="0" max="99999" placeholder="4000"
+                style="width:100%;background:var(--bg3);border:1.5px solid var(--line2);border-radius:10px;padding:10px 12px;color:var(--bright);font-size:18px;font-weight:800;font-family:inherit;outline:none;text-align:center">
+            </div>
+          </div>
+          <div style="margin-bottom:12px">
+            <div style="font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin-bottom:5px">Strokes (paladas totales)</div>
+            <input id="remoStrokes" type="number" min="0" placeholder="480"
+              style="width:100%;background:var(--bg3);border:1.5px solid var(--line2);border-radius:10px;padding:10px 12px;color:var(--bright);font-size:18px;font-weight:800;font-family:inherit;outline:none;text-align:center"
+              oninput="calcSpm()">
+          </div>
+          <!-- SPM calculado -->
+          <div id="spmDisplay" style="display:none;background:var(--bg3);border-radius:10px;padding:10px 14px;margin-bottom:12px;text-align:center">
+            <span style="font-size:11px;color:var(--muted);font-weight:700">RITMO PROMEDIO</span>
+            <div style="font-size:28px;font-weight:900;color:var(--carb);letter-spacing:-1px" id="spmVal">—</div>
+            <span style="font-size:11px;color:var(--muted)">strokes / minuto</span>
+          </div>
+          <button onclick="guardarRemo()"
+            style="width:100%;background:var(--carb);border:none;border-radius:12px;padding:13px;color:#fff;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;letter-spacing:-.2px">
+            💾 Guardar sesión de remo
+          </button>
+        </div>
+      </div>
+
+      <!-- PILATES -->
+      <div class="card">
+        <div class="card-head">
+          <span class="card-title">🧘 Pilates</span>
+          <span id="pilatesFecha" style="font-size:12px;color:var(--muted)"></span>
+        </div>
+        <div style="padding:14px">
+          <div style="margin-bottom:12px">
+            <div style="font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin-bottom:5px">Duración (min)</div>
+            <input id="pilatesDuracion" type="number" value="60" min="1" max="180"
+              style="width:100%;background:var(--bg3);border:1.5px solid var(--line2);border-radius:10px;padding:10px 12px;color:var(--bright);font-size:18px;font-weight:800;font-family:inherit;outline:none;text-align:center">
+          </div>
+          <div style="margin-bottom:12px">
+            <div style="font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin-bottom:5px">Notas (opcional)</div>
+            <textarea id="pilatresNotas" placeholder="Ej: trabajé core, balance, springs ligeros..."
+              style="width:100%;background:var(--bg3);border:1.5px solid var(--line2);border-radius:10px;padding:10px 12px;color:var(--bright);font-size:14px;font-family:inherit;outline:none;resize:none;min-height:70px"></textarea>
+          </div>
+          <button onclick="guardarPilates()"
+            style="width:100%;background:var(--prot);border:none;border-radius:12px;padding:13px;color:#fff;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;letter-spacing:-.2px">
+            💾 Guardar sesión de Pilates
+          </button>
+        </div>
+      </div>
+
+      <!-- HISTORIAL EJERCICIO -->
+      <div class="section-lbl">Últimas sesiones</div>
+      <div id="ejercicioHistDiv"><div class="emeal">Cargando...</div></div>
+    </div>
+
     <!-- INFORME -->
     <div class="page" id="pageInforme">
       <div id="repDiv"></div>
@@ -435,6 +507,7 @@ html,body{height:100%;background:var(--bg);color:var(--body);font-family:'Plus J
     <button class="nb" onclick="goPage('Historial',this)"><div class="nb-ico">🗓️</div><div class="nb-lbl">Historial</div></button>
     <button class="nb" onclick="goPage('Logros',this)"><div class="nb-ico">🥇</div><div class="nb-lbl">Logros</div></button>
     <button class="nb" onclick="goPage('Cuerpo',this)"><div class="nb-ico">💪</div><div class="nb-lbl">Cuerpo</div></button>
+    <button class="nb" onclick="goPage('Ejercicio',this)"><div class="nb-ico">🏋️</div><div class="nb-lbl">Ejercicio</div></button>
     <button class="nb" onclick="goPage('Informe',this)"><div class="nb-ico">📈</div><div class="nb-lbl">Informe</div></button>
   </div>
 </div>
@@ -749,7 +822,116 @@ function goPage(name, btn) {
   if(name==='Historial') renderHist();
   if(name==='Logros')    renderAch();
   if(name==='Cuerpo')    renderCuerpo();
+  if(name==='Ejercicio') renderEjercicioHist();
   if(name==='Informe')   renderRep();
+}
+
+// ── EJERCICIO ──────────────────────────────────────────────
+function calcSpm() {
+  const dur = parseFloat(document.getElementById('remoDuracion').value) || 0;
+  const str = parseFloat(document.getElementById('remoStrokes').value) || 0;
+  const disp = document.getElementById('spmDisplay');
+  if(dur > 0 && str > 0) {
+    const spm = (str / dur).toFixed(1);
+    document.getElementById('spmVal').textContent = spm;
+    disp.style.display = 'block';
+  } else {
+    disp.style.display = 'none';
+  }
+}
+
+async function guardarRemo() {
+  const dur = parseFloat(document.getElementById('remoDuracion').value) || null;
+  const dist = parseFloat(document.getElementById('remoDistancia').value) || null;
+  const str = parseFloat(document.getElementById('remoStrokes').value) || null;
+  const spm = (dur && str) ? parseFloat((str/dur).toFixed(1)) : null;
+  if(!dur) { alert('Ingresa al menos el tiempo'); return; }
+  const body = { user_key:USER, date:TODAY(), type:'remo', duration_min:dur, distance_m:dist, strokes:str, spm:spm };
+  const r = await fetch(SB+'/rest/v1/nl_exercise', {
+    method:'POST',
+    headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+    body: JSON.stringify(body)
+  });
+  if(r.ok) {
+    document.getElementById('remoDuracion').value='';
+    document.getElementById('remoDistancia').value='';
+    document.getElementById('remoStrokes').value='';
+    document.getElementById('spmDisplay').style.display='none';
+    renderEjercicioHist();
+    alert('✅ Sesión de remo guardada');
+  } else { alert('Error guardando'); }
+}
+
+async function guardarPilates() {
+  const dur = parseFloat(document.getElementById('pilatesDuracion').value) || 60;
+  const notas = document.getElementById('pilatresNotas').value.trim();
+  const body = { user_key:USER, date:TODAY(), type:'pilates', duration_min:dur, notas:notas||null };
+  const r = await fetch(SB+'/rest/v1/nl_exercise', {
+    method:'POST',
+    headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+    body: JSON.stringify(body)
+  });
+  if(r.ok) {
+    document.getElementById('pilatresNotas').value='';
+    renderEjercicioHist();
+    alert('✅ Sesión de Pilates guardada');
+  } else { alert('Error guardando'); }
+}
+
+function fmtFechaEj(d) {
+  const [y,m,dia] = d.split('-');
+  const dias = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  const fecha = new Date(y,m-1,dia);
+  return dias[fecha.getDay()]+' '+dia+'/'+m;
+}
+
+async function renderEjercicioHist() {
+  const el = document.getElementById('ejercicioHistDiv');
+  if(!el) return;
+  const hoy = TODAY();
+  document.getElementById('remoFecha').textContent = fmtFechaEj(hoy);
+  document.getElementById('pilatesFecha').textContent = fmtFechaEj(hoy);
+  const data = await sbGet('/rest/v1/nl_exercise?user_key=eq.'+USER+'&order=date.desc,created_at.desc&limit=20');
+  if(!data || data.length===0) { el.innerHTML='<div class="emeal">Sin sesiones registradas aún.</div>'; return; }
+  const byDate = {};
+  data.forEach(s => { if(!byDate[s.date]) byDate[s.date]=[]; byDate[s.date].push(s); });
+  let html = '';
+  Object.keys(byDate).sort((a,b)=>b.localeCompare(a)).forEach(fecha => {
+    html += `<div style="margin-bottom:14px"><div class="section-lbl" style="margin-top:0">${fmtFechaEj(fecha)}</div>`;
+    byDate[fecha].forEach(s => {
+      if(s.type==='remo') {
+        const pts = [];
+        if(s.duration_min) pts.push('⏱ <b>'+s.duration_min+' min</b>');
+        if(s.distance_m) pts.push('📏 <b>'+s.distance_m+' m</b>');
+        if(s.strokes) pts.push('🚣 <b>'+s.strokes+' strokes</b>');
+        if(s.spm) pts.push('⚡ <b>'+s.spm+' spm</b>');
+        html += `<div class="card" style="margin-bottom:8px"><div style="padding:12px 14px;display:flex;align-items:center;gap:10px">
+          <div style="font-size:24px">🚣</div>
+          <div style="flex:1"><div style="font-size:14px;font-weight:800;color:var(--carb)">Remo</div>
+          <div style="font-size:12px;color:var(--body);margin-top:3px;line-height:1.7">${pts.join(' · ')}</div></div>
+          <button onclick="borrarEjercicio('${s.id}')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;padding:4px">🗑</button>
+        </div></div>`;
+      } else {
+        html += `<div class="card" style="margin-bottom:8px"><div style="padding:12px 14px;display:flex;align-items:center;gap:10px">
+          <div style="font-size:24px">🧘</div>
+          <div style="flex:1"><div style="font-size:14px;font-weight:800;color:var(--prot)">Pilates · ${s.duration_min} min</div>
+          ${s.notas?`<div style="font-size:12px;color:var(--muted);margin-top:3px">${s.notas}</div>`:''}
+          </div>
+          <button onclick="borrarEjercicio('${s.id}')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;padding:4px">🗑</button>
+        </div></div>`;
+      }
+    });
+    html += '</div>';
+  });
+  el.innerHTML = html;
+}
+
+async function borrarEjercicio(id) {
+  if(!confirm('¿Borrar esta sesión?')) return;
+  const r = await fetch(SB+'/rest/v1/nl_exercise?id=eq.'+id, {
+    method:'DELETE', headers:{'apikey':KEY,'Authorization':'Bearer '+KEY}
+  });
+  if(r.ok) renderEjercicioHist();
 }
 
 // ═══════════════════════════════════════════════
