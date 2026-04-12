@@ -627,8 +627,8 @@ async function loadFromSupabase() {
     const localTs = DB.get('ts_day_'+r.date) || 0; // timestamp del último guardado local
     const sbTs = r.updated_at ? new Date(r.updated_at).getTime() : 0;
     // Usar Supabase si: local vacío, Supabase más reciente, o sync forzado
-    const forceSync = DB.get('force_sync');
-    if(!localHasData || sbTs > localTs || forceSync) {
+    // Supabase siempre gana si tiene datos más recientes o si local no tiene ts guardado
+    if(!localHasData || sbTs >= localTs || localTs === 0) {
       DB.set('day_'+r.date, {meals: r.meals||{breakfast:[],morning:[],lunch:[],afternoon:[],dinner:[]}});
       DB.set('ts_day_'+r.date, sbTs);
     }
@@ -1041,74 +1041,70 @@ function renderHeatmap() {
   for(let i=6;i>=0;i--) {
     const d=new Date(today+'T12:00:00'); d.setDate(d.getDate()-i);
     const ds=d.toISOString().split('T')[0];
-    dias.push(totals(ds));
+    const t=totals(ds);
+    // Convertir a % de meta para escala uniforme
+    dias.push({
+      p: Math.min(130, t.p/GOALS.p*100),
+      k: Math.min(130, t.k/GOALS.k*100),
+      c: Math.min(130, t.c/GOALS.c*100),
+      f: Math.min(130, t.f/GOALS.f*100),
+    });
     labels.push(dn[d.getDay()]);
   }
 
-  const W=document.getElementById('heatmapDiv').offsetWidth||320;
-  const H=110; const padL=28; const padR=8; const padT=8; const padB=20;
+  const el = document.getElementById('heatmapDiv');
+  const W = el.offsetWidth || 320;
+  const H=120; const padL=26; const padR=8; const padT=12; const padB=20;
   const gW=W-padL-padR; const gH=H-padT-padB;
   const n=dias.length;
   const xStep=gW/(n-1);
+  const maxV=120; // % máximo mostrado
 
-  // Líneas de meta (punteadas)
-  const metas=[
-    {key:'p',color:'var(--prot)',  label:'P', meta:GOALS.p},
-    {key:'k',color:'var(--kcal)', label:'K', meta:GOALS.k},
-    {key:'c',color:'var(--carb)', label:'C', meta:GOALS.c},
-    {key:'f',color:'var(--fat)',  label:'G', meta:GOALS.f},
-  ];
-
-  // Escala: máximo entre todos los valores y metas
-  const allVals=metas.flatMap(m=>dias.map(d=>d[m.key]).concat([m.meta]));
-  const maxV=Math.max(...allVals)*1.05||1;
-
-  const yp=v=>padT+gH-(v/maxV*gH);
+  const yp=v=>padT+gH-(Math.max(0,v)/maxV*gH);
   const xp=i=>padL+i*xStep;
 
-  // Construir SVG
+  const macros=[
+    {key:'p', color:'var(--prot)',  label:'P'},
+    {key:'k', color:'var(--kcal)', label:'K'},
+    {key:'c', color:'var(--carb)', label:'C'},
+    {key:'f', color:'var(--fat)',  label:'G'},
+  ];
+
   let svg=`<svg width="100%" height="${H}" viewBox="0 0 ${W} ${H}" style="display:block;overflow:visible">`;
 
-  // Grid lines
-  [0,0.25,0.5,0.75,1].forEach(f=>{
-    const y=padT+gH*(1-f);
-    svg+=`<line x1="${padL}" y1="${y}" x2="${W-padR}" y2="${y}" stroke="var(--line)" stroke-width="1"/>`;
+  // Grid 50% y 100%
+  [0, 50, 100].forEach(pct=>{
+    const y=yp(pct);
+    svg+=`<line x1="${padL}" y1="${y}" x2="${W-padR}" y2="${y}" stroke="var(--line)" stroke-width="${pct===100?1.5:1}" stroke-dasharray="${pct===100?'4,3':''}"/>`;
+    if(pct===100) svg+=`<text x="${padL-3}" y="${y+3}" text-anchor="end" font-size="8" fill="var(--muted)" font-family="Plus Jakarta Sans,Arial">meta</text>`;
   });
 
-  // Líneas de meta punteadas
-  metas.forEach(m=>{
-    const y=yp(m.meta);
-    svg+=`<line x1="${padL}" y1="${y}" x2="${W-padR}" y2="${y}" stroke="${m.color}" stroke-width="1" stroke-dasharray="3,3" opacity="0.5"/>`;
-  });
-
-  // Líneas de valores reales
-  metas.forEach(m=>{
-    const pts=dias.map((d,i)=>`${xp(i)},${yp(d[m.key])}`).join(' ');
-    svg+=`<polyline points="${pts}" fill="none" stroke="${m.color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
-    // Puntos
+  // Líneas de cada macro
+  macros.forEach(m=>{
+    const pts=dias.map((d,i)=>`${xp(i).toFixed(1)},${yp(d[m.key]).toFixed(1)}`).join(' ');
+    svg+=`<polyline points="${pts}" fill="none" stroke="${m.color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="0.9"/>`;
     dias.forEach((d,i)=>{
-      const v=d[m.key]; const pct=v/m.meta;
-      const fill=pct>=0.85?m.color:'var(--bg2)';
-      svg+=`<circle cx="${xp(i)}" cy="${yp(v)}" r="3" fill="${fill}" stroke="${m.color}" stroke-width="1.5"/>`;
+      const pct=d[m.key];
+      const filled=pct>=85;
+      svg+=`<circle cx="${xp(i).toFixed(1)}" cy="${yp(pct).toFixed(1)}" r="${filled?3.5:2.5}" fill="${filled?m.color:'var(--bg2)'}" stroke="${m.color}" stroke-width="1.5"/>`;
     });
   });
 
   // Labels eje X
   labels.forEach((l,i)=>{
-    svg+=`<text x="${xp(i)}" y="${H-4}" text-anchor="middle" font-size="9" font-family="Plus Jakarta Sans,Arial" fill="var(--muted)">${l}</text>`;
+    svg+=`<text x="${xp(i).toFixed(1)}" y="${H-3}" text-anchor="middle" font-size="9" font-family="Plus Jakarta Sans,Arial" fill="var(--muted)">${l}</text>`;
   });
 
-  // Leyenda
-  const legX=[padL, padL+48, padL+96, padL+144];
-  metas.forEach((m,i)=>{
-    svg+=`<rect x="${legX[i]}" y="0" width="8" height="8" rx="2" fill="${m.color}"/>`;
-    svg+=`<text x="${legX[i]+10}" y="8" font-size="9" font-family="Plus Jakarta Sans,Arial" fill="var(--muted)">${m.label}</text>`;
+  // Leyenda compacta
+  const legItems=[['P','var(--prot)'],['K','var(--kcal)'],['C','var(--carb)'],['G','var(--fat)']];
+  legItems.forEach(([lbl,clr],i)=>{
+    const lx=padL+i*38;
+    svg+=`<rect x="${lx}" y="1" width="8" height="8" rx="2" fill="${clr}"/>`;
+    svg+=`<text x="${lx+10}" y="9" font-size="9" font-family="Plus Jakarta Sans,Arial" fill="var(--muted)">${lbl}</text>`;
   });
-  // Nota meta
-  svg+=`<text x="${W-padR}" y="8" text-anchor="end" font-size="8" font-family="Plus Jakarta Sans,Arial" fill="var(--muted)" opacity="0.6">--- meta</text>`;
 
   svg+='</svg>';
-  document.getElementById('heatmapDiv').innerHTML=`<div style="padding:4px 0 0">${svg}</div>`;
+  el.innerHTML=`<div style="padding:6px 0 0">${svg}</div>`;
 }
 
 function renderMeals() {
@@ -1955,6 +1951,17 @@ function init() {
     if(g.lastDate!==TODAY()){g.lastDate=TODAY();DB.set('game',g);addXP(5);checkAchs();}
     renderHoy();
   });
+}
+
+async function forceResync() {
+  // Limpiar timestamps para forzar que Supabase gane
+  const keys = Object.keys(localStorage).filter(k=>k.startsWith('ts_day_')||k.startsWith('ts_sups_'));
+  keys.forEach(k=>localStorage.removeItem(k));
+  await loadFromSupabase();
+  renderHoy();
+  renderSum(sumDate);
+  const btn = document.querySelector('[onclick="forceResync()"]');
+  if(btn) { btn.textContent='✅'; setTimeout(()=>btn.textContent='🔄',1500); }
 }
 
 init();
